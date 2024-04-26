@@ -62,10 +62,17 @@ def main():
         "'dense_performance', 'dense_sparse', 'performance_sparse', "
         "'dense_performance-spatial', or 'all'",
     )
+    parser.add_argument(
+        "-s",
+        "--storage",
+        default="co2",
+        help="'co2' or 'h2' storage ('co2' by default).",
+    )
     cmdargs = vars(parser.parse_known_args()[0])
     dic = {"folders": [cmdargs["folder"].strip()]}
     dic["case"] = cmdargs["deck"].strip()
     dic["generate"] = cmdargs["generate"].strip()
+    dic["storage"] = cmdargs["storage"].strip()
     dic["compare"] = cmdargs["compare"]  # No empty, then the create compare folder
     dic["exe"] = os.getcwd()  # Path to the folder of the configuration file
     plot_results(dic)
@@ -207,14 +214,15 @@ def performance(dic):
 def sparse_data(dic):
     """time plots"""
     dic["fig"] = plt.figure(figsize=(25, 40))
-    plots = ["sensors", "boxA", "boxB", "boxC", "facie 1"]
-    ylabels = ["Presure [Pa]", "Mass [kg]", "Mass [kg]", "Area [m$^2$]", "Mass [kg]"]
+    plots = ["sensors", "boxA", "boxB", "boxC", "facie 1", "Mass of biofilm"]
+    ylabels = ["Presure [Pa]", "Mass [kg]", "Mass [kg]", "Area [m$^2$]", "Mass [kg]", "Mass [kg]"]
     labels = [
         ["p1", "p2"],
         ["mobA", "immA", "dissA", "sealA"],
         ["mobB", "immB", "dissB", "sealB"],
         ["MC"],
         ["sealTot"],
+        ["bioMass"],
     ]
     dic["nfigs"] = 5
     if dic["case"] != "spe11a":
@@ -321,6 +329,8 @@ def generate_grid(dic):
         "PuOr_r",
         "turbo",
         "coolwarm",
+        "copper",
+        "cool",
     ]
     return dic
 
@@ -331,11 +341,13 @@ def handle_kind(dic, kind):
         dic["quantities"] = [
             "pressure",
             "sgas",
-            "xco2",
+            f"x{dic['storage']}",
             "xh20",
             "gden",
             "wden",
-            "tco2",
+            f"t{dic['storage']}",
+            "biofilm pore fraction",
+            "permeability multiplier",
         ]
         dic["units"] = [
             "[Pa]",
@@ -345,8 +357,10 @@ def handle_kind(dic, kind):
             r"[kg/m$^3$]",
             r"[kg/m$^3$]",
             "[kg]",
+            "[-]",
+            "[-]",
         ]
-        dic["allplots"] = [-1, -1, -1, -1, -1, -1, -1]
+        dic["allplots"] = [-1, -1, -1, -1, -1, -1, -1, -1, -1]
         if dic["case"] != "spe11a":
             dic["quantities"] += ["temp"]
             dic["units"] += ["C"]
@@ -355,9 +369,9 @@ def handle_kind(dic, kind):
         dic["quantities"] = [
             "cvol",
             "arat",
-            "CO2 max_norm_res",
+            f"{dic['storage'].upper()} max_norm_res",
             "H2O max_norm_res",
-            "CO2 mb_error",
+            f"{dic['storage'].upper()} mb_error",
             "H2O mb_error",
         ]
         dic["units"] = [r"[m$^3$]", "[-]", "[-]", "[-]", "[-]", "[-]"]
@@ -405,7 +419,7 @@ def dense_data(dic):
                 quan = np.array([csv[i][dic["dims"] + k] for i in range(csv.shape[0])])
                 dic["min"].append(quan[~np.isnan(quan)].min())
                 dic["max"].append(quan[~np.isnan(quan)].max())
-                if quantity == "tco2":
+                if quantity == f"t{dic['storage']}":
                     dic["sum"].append(quan[quan >= 0].sum())
                 dic["minc"] = min(dic["minc"], dic["min"][-1])
                 dic["maxc"] = max(dic["maxc"], dic["max"][-1])
@@ -436,7 +450,7 @@ def dense_data(dic):
                     shading="flat",
                     cmap=dic["cmaps"][k],
                 )
-                if quantity == "tco2":
+                if quantity == f"t{dic['storage']}":
                     axis.set_title(
                         f"{time}{dic['tlabel']}, {quantity} "
                         + dic["units"][k]

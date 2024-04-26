@@ -20,6 +20,7 @@ def pyopmspe11():
     file = cmdargs["input"].strip()  # Name of the input file
     dic = {"fol": cmdargs["output"].strip()}  # Name for the output folder
     dic["generate"] = cmdargs["generate"].strip()  # What data to write
+    dic["storage"] = cmdargs["storage"].strip()  # co2 or h2 storage
     dic["exe"] = os.getcwd()  # Path to the folder of the input.txt file
     dic["mode"] = cmdargs["mode"].strip()  # Parts of the workflow to run
     dic["pat"] = os.path.dirname(__file__)[:-5]  # Path to the pyopmspe11 folder
@@ -152,6 +153,12 @@ def load_parser():
         default="0.1",
         help="Time interval for the sparse and performance data (spe11a [h]; spe11b/c [y]) "
         "('0.1' by default).",
+    )
+    parser.add_argument(
+        "-s",
+        "--storage",
+        default="co2",
+        help="'co2' or 'h2' storage ('co2' by default).",
     )
     return vars(parser.parse_known_args()[0])
 

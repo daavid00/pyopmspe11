@@ -105,6 +105,10 @@ def structured_handling_spe11a(dic):
             dic["disperc"].append(
                 f"{dic['dispersion'][int(dic['ids_gmsh'][fgl][0])-1]}"
             )
+            if dic['model'] == 'biofilm':
+                dic["sbact"].append(
+                f"{dic['iniBio'][int(dic['ids_gmsh'][fgl][0])-1]}"
+            )
             centers.append(
                 str([dic["xmx_center"][i], dic["ymy_center"][0], dic["zmz_center"][k]])[
                     1:-1
@@ -627,7 +631,7 @@ def positions(dic):
     """
     dic["sensorijk"] = [[] for _ in range(len(dic["sensors"]))]
     dic = getfacies(dic)
-    for names in ["satnum", "poro", "permx", "thconr", "fipnum", "disperc", "porv"]:
+    for names in ["satnum", "poro", "permx", "thconr", "fipnum", "disperc", "porv", "sbact"]:
         dic[f"{names}"] = []
     if dic["grid"] == "corner-point":
         if dic["use"] == "opm":

@@ -145,7 +145,7 @@ def readthesecondpart(lol, dic):
         lol[dic["index"] + 3][0]
     )  # Capillary pressure saturation function [Pa]
     dic["index"] += 7
-    for name in ["rock", "safu", "dispersion", "rockCond"]:
+    for name in ["rock", "safu", "dispersion", "rockCond", "micrPara", "permPoro", "iniBio"]:
         dic[name] = []
     dic["tabdims"] = 1
     for i in range(dic["noSands"]):  # Saturation function values
@@ -176,7 +176,31 @@ def readthesecondpart(lol, dic):
                     float(row[7]) * 86400.0 / 1e3,
                 ]
             )
-    dic["index"] += 3 + dic["noSands"]
+    if dic["model"] == "biofilm":
+        dic["index"] += 2 + dic["noSands"]
+        for i in range(dic["noSands"]):
+            row = list((lol[dic["index"] + i][0].strip()).split())
+            dic["micrPara"].append(
+                [
+                    row[1],
+                    row[3],
+                    row[5],
+                    row[7],
+                    row[9],
+                ]
+            )
+            dic["permPoro"].append(
+                    [
+                        row[11],
+                        row[13],
+                        row[15],
+                        row[17],
+                    ]
+                )
+            dic["iniBio"].append(row[19])
+        dic["index"] += 3 + dic["noSands"]
+    else:
+        dic["index"] += 3 + dic["noSands"]
     column = []
     columnf = []
     dic["radius"] = []

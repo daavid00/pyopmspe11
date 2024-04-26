@@ -79,6 +79,8 @@ def write_keywords(dic):
         and dic["flow_version"] != "2023.10"
     ):
         keywords += ["disperc"]
+    if dic['model'] == 'biofilm':
+        keywords += ["sbact"]
     for names in keywords:
         dic[f"{names}"].insert(0, f"{names.upper()}")
         dic[f"{names}"].insert(0, git)
@@ -118,7 +120,7 @@ def opm_files(dic):
 
     """
     write_keywords(dic)
-    mytemplate = Template(filename=f"{dic['pat']}/templates/co2/{dic['spe11']}.mako")
+    mytemplate = Template(filename=f"{dic['pat']}/templates/{dic['storage']}/{dic['spe11']}.mako")
     var = {"dic": dic}
     filledtemplate = mytemplate.render(**var)
     with open(
