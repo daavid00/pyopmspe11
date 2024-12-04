@@ -34,6 +34,7 @@ def grid(dic):
     if dic["grid"] == "corner-point":
         corner(dic)
     elif dic["grid"] == "cartesian":
+        dic["dsize"] = [1.0 * dic["dims"][i] / dic["noCells"][i] for i in range(3)]
         for i, name in enumerate(["xmx", "ymy", "zmz"]):
             dic[f"{name}"] = np.linspace(0, dic["dims"][i], dic["noCells"][i] + 1)
     else:
@@ -99,8 +100,8 @@ def structured_handling_spe11a(dic):
             )
             dic["satnum"].append(dic["ids_gmsh"][fgl][0])
             boxes(dic, dic["xmx_center"][i], dic["zmz_center"][k], i, dic["satnum"][-1])
-            dic["permx"].append(dic["rock"][int(dic["ids_gmsh"][fgl][0]) - 1][0])
-            dic["poro"].append(dic["rock"][int(dic["ids_gmsh"][fgl][0]) - 1][1])
+            dic["permx"].append(f"{dic['rock'][int(dic['ids_gmsh'][fgl][0]) - 1][0]}")
+            dic["poro"].append(f"{dic['rock'][int(dic['ids_gmsh'][fgl][0]) - 1][1]}")
             dic["disperc"].append(
                 f"{dic['dispersion'][int(dic['ids_gmsh'][fgl][0])-1]}"
             )
@@ -170,13 +171,11 @@ def structured_handling_spe11bc(dic):
                 z_c -= map_z(dic, 0)
             dic["satnum"].append(dic["ids_gmsh"][fgl][0])
             boxes(dic, dic["xmx_center"][i], z_c, i, dic["satnum"][-1])
-            dic["permx"].append(dic["rock"][int(dic["ids_gmsh"][fgl][0]) - 1][0])
-            poro = dic["rock"][int(dic["ids_gmsh"][fgl][0]) - 1][1]
+            dic["permx"].append(f"{dic['rock'][int(dic['ids_gmsh'][fgl][0]) - 1][0]}")
+            poro = f"{dic['rock'][int(dic['ids_gmsh'][fgl][0]) - 1][1]}"
             dic["poro"].append(poro)
             pv = float(poro) * (dic["pvAdded"] + dic["widthBuffer"])
-            dic["thconr"].append(
-                f"{dic['rockCond'][int(dic['ids_gmsh'][fgl][0])-1][0]}"
-            )
+            dic["thconr"].append(f"{dic['rockCond'][int(dic['ids_gmsh'][fgl][0])-1]}")
             dic["disperc"].append(
                 f"{dic['dispersion'][int(dic['ids_gmsh'][fgl][0])-1]}"
             )
@@ -387,8 +386,8 @@ def corner_point_handling_spe11a(dic):
         )
         dic["satnum"].append(dic["ids_gmsh"][fgl][0])
         boxes(dic, dic["xyz"][0], dic["xyz"][2], dic["ijk"][0], dic["satnum"][-1])
-        dic["permx"].append(dic["rock"][int(dic["ids_gmsh"][fgl][0]) - 1][0])
-        dic["poro"].append(dic["rock"][int(dic["ids_gmsh"][fgl][0]) - 1][1])
+        dic["permx"].append(f"{dic['rock'][int(dic['ids_gmsh'][fgl][0]) - 1][0]}")
+        dic["poro"].append(f"{dic['rock'][int(dic['ids_gmsh'][fgl][0]) - 1][1]}")
         dic["disperc"].append(f"{dic['dispersion'][int(dic['ids_gmsh'][fgl][0])-1]}")
         centers.append(str([dic["xyz"][0], dic["ymy_center"][0], dic["xyz"][2]])[1:-1])
         corners.append(dic["corns"])
@@ -519,12 +518,12 @@ def corner_point_handling_spe11bc(dic):
             z_c -= map_z(dic, dic["ijk"][1])
         dic["satnum"].append(dic["ids_gmsh"][fgl][0])
         boxes(dic, dic["xyz"][0], z_c, dic["ijk"][0], dic["satnum"][-1])
-        dic["permx"].append(dic["rock"][int(dic["ids_gmsh"][fgl][0]) - 1][0])
-        poro = dic["rock"][int(dic["ids_gmsh"][fgl][0]) - 1][1]
+        dic["permx"].append(f"{dic['rock'][int(dic['ids_gmsh'][fgl][0]) - 1][0]}")
+        poro = f"{dic['rock'][int(dic['ids_gmsh'][fgl][0]) - 1][1]}"
         dic["poro"].append(poro)
         pv = float(poro) * (dic["pvAdded"] + dic["widthBuffer"])
         dic["disperc"].append(f"{dic['dispersion'][int(dic['ids_gmsh'][fgl][0])-1]}")
-        dic["thconr"].append(f"{dic['rockCond'][int(dic['ids_gmsh'][fgl][0])-1][0]}")
+        dic["thconr"].append(f"{dic['rockCond'][int(dic['ids_gmsh'][fgl][0])-1]}")
         if dic["ijk"][0] == 0 and (
             int(dic["ids_gmsh"][fgl][0]) != 1 and int(dic["ids_gmsh"][fgl][0]) != 7
         ):
@@ -621,14 +620,13 @@ def locate_wells_sensors(dic):
         dic["sensorijk"][1] = list(dic["gridf"].get_ijk(global_index=dic["pop2"]))
     dic["wellijk"][0] = [well1ijk[0] + 1, 1, well1ijk[2] + 1]
     dic["wellijk"][1] = [well2ijk[0] + 1, 1, well2ijk[2] + 1]
-    # Work in process to implement properly this for the corner-point grid in spe11c
     if dic["spe11"] == "spe11c":
         dic["wellijkf"] = [[] for _ in range(len(dic["wellCoord"]))]
         dic["wellijkf"][0] = [dic["wellijk"][0][0], 1, dic["wellijk"][0][2]]
         dic["wellijkf"][1] = [dic["wellijk"][1][0], 1, dic["wellijk"][1][2]]
         dic["ymy_center"] = (np.array(dic["ymy"][1:]) + np.array(dic["ymy"][:-1])) / 2.0
         wji = pd.Series(abs(dic["wellCoord"][0][1] - dic["ymy_center"])).argmin() + 1
-        wjf = pd.Series(abs(dic["wellCoordf"][0][1] - dic["ymy_center"])).argmin() + 1
+        wjf = pd.Series(abs(dic["wellCoordF"][0][1] - dic["ymy_center"])).argmin() + 1
         sj1 = pd.Series(abs(dic["sensors"][0][1] - dic["ymy_center"])).argmin()
         sj2 = pd.Series(abs(dic["sensors"][1][1] - dic["ymy_center"])).argmin()
         dic["sensorijk"][0][1] = sj1
@@ -834,7 +832,7 @@ def wells(dic):
                 )
                 dic["wellijkf"][j].append(
                     pd.Series(
-                        abs(dic["wellCoordf"][j][k] - dic[f"{axis}_center"])
+                        abs(dic["wellCoordF"][j][k] - dic[f"{axis}_center"])
                     ).argmin()
                     + 1
                 )
