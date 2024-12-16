@@ -689,6 +689,14 @@ def boxes(dic, x_c, z_c, idx, satnum):
         & (x_c <= dic["boxc"][1][0])
     ):
         check_facie1(dic, satnum, "12", "4")
+        if dic["fips"] == 1:
+            if ((x_c >= dic["boxc"][0][0]+0.5*(dic["boxc"][1][0]-dic["boxc"][0][0])) & (dic["dims"][2] + dic["maxelevation"] - z_c <= dic["boxc"][0][2]+0.5*(dic["boxc"][1][2]-dic["boxc"][0][2]))):
+                dic["fipnum"][-1] = "23"
+            elif (x_c >= dic["boxc"][0][0]+0.5*(dic["boxc"][1][0]-dic["boxc"][0][0])):
+                dic["fipnum"][-1] = "21"
+            elif (dic["dims"][2] + dic["maxelevation"] - z_c <= dic["boxc"][0][2]+0.5*(dic["boxc"][1][2]-dic["boxc"][0][2])):
+                dic["fipnum"][-1] = "22"
+
     elif (
         (dic["dims"][2] + dic["maxelevation"] - z_c >= dic["boxa"][0][2])
         & (dic["dims"][2] + dic["maxelevation"] - z_c <= dic["boxa"][1][2])
@@ -698,10 +706,31 @@ def boxes(dic, x_c, z_c, idx, satnum):
         check_facie1(dic, satnum, "5", "2")
     elif dic["spe11"] != "spe11a" and idx in (0, dic["noCells"][0] - 1):
         check_facie1(dic, satnum, "10", "11")
+        if dic["fips"] == 1:
+            if idx == 0 and satnum != "1" and dic["dims"][2] + dic["maxelevation"] - z_c < 317:
+                dic["fipnum"][-1] = "25"
+            elif idx == 0 and satnum == "1" and dic["dims"][2] + dic["maxelevation"] - z_c < 600:
+                dic["fipnum"][-1] = "26"
+            elif idx == dic["noCells"][0] - 1 and satnum != "1" and dic["dims"][2] + dic["maxelevation"] - z_c < 500:
+                dic["fipnum"][-1] = "25"
+            elif idx == dic["noCells"][0] - 1 and satnum == "1" and dic["dims"][2] + dic["maxelevation"] - z_c < 600:
+                dic["fipnum"][-1] = "26"
+
     elif satnum == "1":
         dic["fipnum"].append("7")
     else:
-        dic["fipnum"].append("1")
+        dic["fipnum"].append("19")
+    if dic["fips"] == 1 and dic["fipnum"][-1] not in ["10","11","25","26"]:
+        if (satnum != "1" and dic["fipnum"][-1]!="2" and (x_c >= dic["boxa"][0][0]) & (dic["dims"][2] + dic["maxelevation"] - z_c >=519)):
+            dic["fipnum"][-1] = "1"
+        if (satnum != "1" and x_c >= 1321 and x_c < dic["boxa"][0][0] and dic["dims"][2] + dic["maxelevation"] - z_c <479.23):
+            dic["fipnum"][-1] = "20"
+        if (satnum != "1" and x_c < 1321 and dic["dims"][2] + dic["maxelevation"] - z_c <432):
+            dic["fipnum"][-1] = "20"
+        if (satnum != "1" and x_c > dic["boxa"][1][0] and dic["dims"][2] + dic["maxelevation"] - z_c <406):
+            dic["fipnum"][-1] = "20"
+        if (satnum != "1" and dic["fipnum"][-1]=="2" and x_c > 6700 and dic["dims"][2] + dic["maxelevation"] - z_c >=504):
+            dic["fipnum"][-1] = "24"
 
 
 def check_facie1(dic, satnum, numa, numb):

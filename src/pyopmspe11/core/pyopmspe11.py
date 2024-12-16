@@ -32,6 +32,7 @@ def pyopmspe11():
     )  # Temporal resolution to write the sparse and performance data
     dic["showpywarn"] = int(cmdargs["showpywarn"])  # Show or hidde python warnings
     dic["latex"] = int(cmdargs["latex"])  # LaTeX formatting
+    dic["fips"] = int(cmdargs["fipnum"])  # Fipnum type
     if dic["showpywarn"] != 1:
         warnings.warn = lambda *args, **kwargs: None
     # If the compare plots are generated, then we exit right afterwards
@@ -170,6 +171,12 @@ def load_parser():
         "--latex",
         default=1,
         help="Set to 0 to not use LaTeX formatting ('1' by default).",
+    )
+    parser.add_argument(
+        "-f",
+        "--fipnum",
+        default=0,
+        help="Set to 1 for sgm fipnums ('0' by default).",
     )
     return vars(parser.parse_known_args()[0])
 
