@@ -6,7 +6,8 @@
 // File modified from https://github.com/Simulation-Benchmarks/11thSPE-CSP/blob/main/geometries/spe11a.geo
 // to generate a mesh around the boundary of the facies to be used for the location of the different facies.
 
-DefineConstant[ refinement_factor = .05 ];
+DefineConstant[ refinement_factor = .01 ];
+DefineConstant[ delta_border_lines = 1.002e-4 ];
 
 cl__1 = 0.0125*refinement_factor;
 cl__2 = 0.01066435412095127*refinement_factor;
@@ -650,8 +651,8 @@ Line(318) = {287, 257};
 Curve Loop(1) = {305, 1, -24, 255, 256, 257, -258, 200, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304};
 Tp0[] = Point "*";
 Li0[] = Line "*";
-epsx1 = 5.01e-4;
-epsy1 = 5.01e-4;
+epsx1 = delta_border_lines;
+epsy1 = delta_border_lines;
 points = {203, 204, 205, 150, 151};
 Translate {epsx1, epsy1, 0} { Duplicata{ Point{258}; } }
 Translate {epsx1, -epsy1, 0} { Duplicata{ Point{202}; } }
@@ -673,8 +674,8 @@ Curve Loop(101) = {#Li0[]+1:#Li1[]};
 Plane Surface(1) = {1,101};
 
 Curve Loop(31) = {72, 73, 74, 75, -78, -77, -76, -49, -48, -47, -46, -45, -44, -43, -42, -41, -40, 38, 39, -37, 68, 69, 70, 71};
-epsx131 = 5.01e-4;
-epsy131 = 5.01e-4;
+epsx131 = delta_border_lines;
+epsy131 = delta_border_lines;
 Translate {-1.2*epsx131, 5*epsy131, 0} { Duplicata{ Point{35}; } }
 points = {265, 276, 257, 93, 275, 262, 14, 82, 74, 15, 263, 65};
 For i In {0 : #points[]-1}
@@ -699,8 +700,8 @@ Physical Surface("Facies 7", 7) = {1, 31};
 
 // Facies 5
 Curve Loop(2) = {12, -2, -305, -304, -303, -302, -301, -300, -299, -298, -297, -296, -295, -294, -293, 216, -215, -214, -213, 212, -211, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292};
-epsx102 = 5.01e-4;
-epsy102 = 5.01e-4;
+epsx102 = delta_border_lines;
+epsy102 = delta_border_lines;
 Translate {1.2*epsx102, epsy102, 0} { Duplicata{ Point{151}; } }
 points = {164, 272, 273, 163, 172};
 For i In {0 : #points[]-1}
@@ -727,8 +728,8 @@ Curve Loop(102) = {#Li131[]+1:#Li102[]};
 Plane Surface(2) = {2, 102};
 
 Curve Loop(3) = {199, -198, 254, -253, -252, 23, 255, 256, 257, -258};
-epsx103 = 5.01e-4;
-epsy103 = 5.01e-4;
+epsx103 = delta_border_lines;
+epsy103 = delta_border_lines;
 Translate {epsx103, epsy103, 0} { Duplicata{ Point{202}; } }
 Translate {epsx103, -epsy103, 0} { Duplicata{ Point{199}; } }
 Translate {0, -epsy103, 0} { Duplicata{ Point{200}; } }
@@ -748,8 +749,8 @@ Curve Loop(103) = {#Li102[]+1:#Li103[]};
 Plane Surface(3) = {3, 103};
 
 Curve Loop(4) = {160, 77, 78, -75, 161, -306, 100, 101, 102, 103};
-epsx104 = 5.01e-4;
-epsy104 = 5.01e-4;
+epsx104 = delta_border_lines;
+epsy104 = delta_border_lines;
 Translate {epsx104, epsy104, 0} { Duplicata{ Point{35}; } }
 Translate {epsx104, 0, 0} { Duplicata{ Point{36}; } }
 Translate {1.5*epsx104, -epsy104, 0} { Duplicata{ Point{112}; } }
@@ -765,8 +766,8 @@ Curve Loop(104) = {#Li103[]+1:#Li104[]};
 Plane Surface(4) = {4, 104};
 
 Curve Loop(5) = {177, 178, 179, 180, 181, 182, 183, 184, 8, -191, -190, -189, -188, -187, -186, -185, -7, -176, -175, -174, -173, -172, -171, -170, 312, 313};
-epsx105 = 5.01e-4;
-epsy105 = 5.01e-4;
+epsx105 = delta_border_lines;
+epsy105 = delta_border_lines;
 Translate {2*epsx105, epsy105, 0} { Duplicata{ Point{131}; } }
 Translate {0.5*epsx105, -epsy105, 0} { Duplicata{ Point{123}; } }
 points = {124:129};
@@ -797,8 +798,8 @@ Curve Loop(105) = {#Li104[]+1:#Li105[]};
 Plane Surface(5) = {5, 105};
 
 Curve Loop(6) = {131, 132, -37, 68, 69, 70, -144, -143, -142, -141, 140, -139, -138, -137, -136, -135, -134, -133, -18, 126, 127, 128, 129, 130};
-epsx106 = 5.01e-4;
-epsy106 = 5.01e-4;
+epsx106 = delta_border_lines;
+epsy106 = delta_border_lines;
 Translate {epsx106, epsy106, 0} { Duplicata{ Point{83}; } }
 Translate {epsx106, -epsy106, 0} { Duplicata{ Point{75}; } }
 points = {76:81};
@@ -827,8 +828,8 @@ Physical Surface("Facies 5", 5) = {2, 3, 4, 5, 6};
 
 // Facies 1
 Curve Loop(7) = {11, -292, -291, -290, -289, -288, -287, -286, -285, -284, -283, -282, -281, -280, -279, -278, -277, -276, -275, -274, -273, -210, -209, -208, -207, -206, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272};
-epsx107 = 5.01e-4;
-epsy107 = 5.01e-4;
+epsx107 = delta_border_lines;
+epsy107 = delta_border_lines;
 Translate {epsx107, .25*epsy107, 0} { Duplicata{ Point{161}; } }
 Translate {epsx107, 0, 0} { Duplicata{ Point{160}; } }
 Translate {epsx107, -epsy107, 0} { Duplicata{ Point{159}; } }
@@ -855,8 +856,8 @@ Curve Loop(107) = {#Li106[]+1:#Li107[]};
 Plane Surface(7) = {7, 107};
 
 Curve Loop(8) = {196, -197, 254, -253, -252, -22, 246, 247, 248, 249, 250, -251};
-epsx108 = 5.01e-4;
-epsy108 = 5.01e-4;
+epsx108 = delta_border_lines;
+epsy108 = delta_border_lines;
 Translate {epsx108, epsy108, 0} { Duplicata{ Point{199}; } }
 Translate {epsx108, -epsy108, 0} { Duplicata{ Point{193}; } }
 points = {194:198};
@@ -877,8 +878,8 @@ Curve Loop(108) = {#Li107[]+1:#Li108[]};
 Plane Surface(8) = {8, 108};
 
 Curve Loop(9) = {204, 219, -218, -217};
-epsx109 = 5.01e-4;
-epsy109 = 5.01e-4;
+epsx109 = delta_border_lines;
+epsy109 = delta_border_lines;
 Translate {epsx109, 0, 0} { Duplicata{ Point{166}; } }
 Translate {epsx109, -epsy109, 0} { Duplicata{ Point{165}; } }
 Translate {-2*epsx109, -epsy109, 0} { Duplicata{ Point{155}; } }
@@ -893,8 +894,8 @@ Curve Loop(109) = {#Li108[]+1:#Li109[]};
 Plane Surface(9) = {9, 109};
 
 Curve Loop(32) = {4, 13, -15, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 43, 50, 51, 52, 53, 54, 55, 56, -57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67};
-epsx132 = 5.01e-4;
-epsy132 = 5.01e-4;
+epsx132 = delta_border_lines;
+epsy132 = delta_border_lines;
 Translate {epsx132, epsy132, 0} { Duplicata{ Point{1}; } }
 Translate {epsx132, -epsy132, 0} { Duplicata{ Point{261}; } }
 Translate {-epsx132, -epsy132, 0} { Duplicata{ Point{260}; } }
@@ -921,8 +922,8 @@ Physical Surface("Facies 1", 1) = {7, 8, 9, 32};
 
 // Facies 4
 Curve Loop(10) = {194, -245, -244, -243, -242, 21, 246, 247, 248, 249, 250, -251};
-epsx110 = 5.01e-4;
-epsy110 = 5.01e-4;
+epsx110 = delta_border_lines;
+epsy110 = delta_border_lines;
 Translate {epsx110, epsy110, 0} { Duplicata{ Point{193}; } }
 Translate {epsx110, -epsy110, 0} { Duplicata{ Point{188}; } }
 Translate {epsx110, -epsy110, 0} { Duplicata{ Point{189}; } }
@@ -944,8 +945,8 @@ Curve Loop(110) = {#Li132[]+1:#Li110[]};
 Plane Surface(10) = {10, 110};
 
 Curve Loop(11) = {203, 204, 205, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, -9, -184, -183, -182, -181, -180, -179, -178, -177, -308, -307, 306, -161, -74, -73, -72, -318, -317, -316, -315, -314};
-epsx111 = 5.01e-4;
-epsy111 = 5.01e-4;
+epsx111 = delta_border_lines;
+epsy111 = delta_border_lines;
 Translate {epsx111, epsy111, 0} { Duplicata{ Point{157}; } }
 Translate {epsx111, 0, 0} { Duplicata{ Point{156}; } }
 Translate {epsx111, 0, 0} { Duplicata{ Point{155}; } }
@@ -978,8 +979,8 @@ Curve Loop(111) = {#Li110[]+1:#Li111[]};
 Plane Surface(11) = {11, 111};
 
 Curve Loop(12) = {10, -191, -190, -189, -188, -187, -186, -185};
-epsx112 = 5.01e-4;
-epsy112 = 5.01e-4;
+epsx112 = delta_border_lines;
+epsy112 = delta_border_lines;
 Translate {2*epsx112, 0, 0} { Duplicata{ Point{142}; } }
 Translate {0, -epsy112, 0} { Duplicata{ Point{141}; } }
 Translate {0, -epsy112, 0} { Duplicata{ Point{140}; } }
@@ -998,8 +999,8 @@ Curve Loop(112) = {#Li111[]+1:#Li112[]};
 Plane Surface(12) = {12, 112};
 
 Curve Loop(13) = {6, -176, -175, -174, -173, -172, -171, -170, -311, 162, 163, 164, 165, 166, 167, 168, 169};
-epsx113 = 5.01e-4;
-epsy113 = 5.01e-4;
+epsx113 = delta_border_lines;
+epsy113 = delta_border_lines;
 Translate {epsx113, epsy113, 0} { Duplicata{ Point{123}; } }
 Translate {epsx113, -epsy113, 0} { Duplicata{ Point{114}; } }
 points = {115:121};
@@ -1022,8 +1023,8 @@ Curve Loop(113) = {#Li112[]+1:#Li113[]};
 Plane Surface(13) = {13, 113};
 
 Curve Loop(14) = {99, -159, -158, -157, 49, 76, -160};
-epsx114 = 5.01e-4;
-epsy114 = 5.01e-4;
+epsx114 = delta_border_lines;
+epsy114 = delta_border_lines;
 Translate {epsx114, epsy114, 0} { Duplicata{ Point{112}; } }
 Translate {epsx114, 0, 0} { Duplicata{ Point{17}; } }
 Translate {1.25*epsx114, -epsy114, 0} { Duplicata{ Point{108}; } }
@@ -1041,8 +1042,8 @@ Curve Loop(114) = {#Li113[]+1:#Li114[]};
 Plane Surface(14) = {14, 114};
 
 Curve Loop(15) = {39, -132, -131, -130, -129, -128, -127, -126, -17, 118, 119, 120, 121, 122, 123, 124, 125};
-epsx115 = 5.01e-4;
-epsy115 = 5.01e-4;
+epsx115 = delta_border_lines;
+epsy115 = delta_border_lines;
 Translate {epsx115, epsy115, 0} { Duplicata{ Point{75}; } }
 Translate {epsx115, -epsy115, 0} { Duplicata{ Point{66}; } }
 points = {67:73};
@@ -1065,8 +1066,8 @@ Curve Loop(115) = {#Li114[]+1:#Li115[]};
 Plane Surface(15) = {15, 115};
 
 Curve Loop(22) = {212, 226, -237, -236, -235, -234, -233, 231, 232, -230, -229, -227, -215, -214, -213};
-epsx122 = 5.01e-4;
-epsy122 = 5.01e-4;
+epsx122 = delta_border_lines;
+epsy122 = delta_border_lines;
 Translate {1.25*epsx122, 0.75*epsy122, 0} { Duplicata{ Point{174}; } }
 Translate {2*epsx122, epsy122, 0} { Duplicata{ Point{175}; } }
 Translate {2*epsx122, 0.75*epsy122, 0} { Duplicata{ Point{176}; } }
@@ -1095,8 +1096,8 @@ Physical Surface("Facies 4", 4) = {10, 11, 12, 13, 14, 15, 22};
 
 // Facies 3
 Curve Loop(16) = {20, 242, 243, 244, 245, -195, -241, -240, -239, -238};
-epsx116 = 5.01e-4;
-epsy116 = 5.01e-4;
+epsx116 = delta_border_lines;
+epsy116 = delta_border_lines;
 Translate {epsx116, epsy116, 0} { Duplicata{ Point{188}; } }
 Translate {epsx116, -epsy116, 0} { Duplicata{ Point{183}; } }
 Translate {0, -epsy116, 0} { Duplicata{ Point{184}; } }
@@ -1117,8 +1118,8 @@ Curve Loop(116) = {#Li122[]+1:#Li116[]};
 Plane Surface(16) = {16, 116};
 
 Curve Loop(17) = {201, 202, 314, 315, 316, 317, 318, -71, -144, -143, -142, -141, 140};
-epsx117 = 5.01e-4;
-epsy117 = 5.01e-4;
+epsx117 = delta_border_lines;
+epsy117 = delta_border_lines;
 Translate {1.25*epsx117, epsy117, 0} { Duplicata{ Point{154}; } }
 Translate {epsx117, -.5*epsy117, 0} { Duplicata{ Point{153}; } }
 Translate {0, -epsy117, 0} { Duplicata{ Point{152}; } }
@@ -1140,8 +1141,8 @@ Curve Loop(117) = {#Li116[]+1:#Li117[]};
 Plane Surface(17) = {17, 117};
 
 Curve Loop(18) = {5, -169, -168, -167, -166, -165, -164, -163, -162, -309, 149, 150, 151, 152, 153, 154, 155, 156};
-epsx118 = 5.01e-4;
-epsy118 = 5.01e-4;
+epsx118 = delta_border_lines;
+epsy118 = delta_border_lines;
 Translate {1.25*epsx118, epsy118, 0} { Duplicata{ Point{114}; } }
 Translate {epsx118, -epsy118, 0} { Duplicata{ Point{99}; } }
 points = {100:106};
@@ -1164,8 +1165,8 @@ Curve Loop(118) = {#Li117[]+1:#Li118[]};
 Plane Surface(18) = {18, 118};
 
 Curve Loop(19) = {91, -148, -147, -146, -145, 46, 47, 48, 157, 158, 159, -98, -97, -96, -95, -94, -93, -92};
-epsx119 = 5.01e-4;
-epsy119 = 5.01e-4;
+epsx119 = delta_border_lines;
+epsy119 = delta_border_lines;
 Translate {epsx119, epsy119, 0} { Duplicata{ Point{108}; } }
 Translate {1.25*epsx119, -epsy119, 0} { Duplicata{ Point{94}; } }
 Translate {0, -epsy119, 0} { Duplicata{ Point{95}; } }
@@ -1192,8 +1193,8 @@ Curve Loop(119) = {#Li118[]+1:#Li119[]};
 Plane Surface(19) = {19, 119};
 
 Curve Loop(20) = {117, -41, -40, 38, -125, -124, -123, -122, -121, -120, -119, -118, -16, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116};
-epsx120 = 5.01e-4;
-epsy120 = 5.01e-4;
+epsx120 = delta_border_lines;
+epsy120 = delta_border_lines;
 Translate {epsx120, epsy120, 0} { Duplicata{ Point{66}; } }
 Translate {epsx120, -epsy120, 0} { Duplicata{ Point{51}; } }
 points = {52:64};
@@ -1218,8 +1219,8 @@ Curve Loop(120) = {#Li119[]+1:#Li120[]};
 Plane Surface(20) = {20, 120};
 
 Curve Loop(21) = {205, 206, 207, 208, 209, 210, 211, 226, -225, -196, 220, 221, 222, 223, -224, -219};
-epsx121 = 5.01e-4;
-epsy121 = 5.01e-4;
+epsx121 = delta_border_lines;
+epsy121 = delta_border_lines;
 Translate {epsx121, epsy121, 0} { Duplicata{ Point{171}; } }
 Translate {0.5*epsx121, -1.5*epsy121, 0} { Duplicata{ Point{148}; } }
 Translate {0.5*epsx121, -1*epsy121, 0} { Duplicata{ Point{167}; } }
@@ -1248,8 +1249,8 @@ Physical Surface("Facies 3", 3) = {16, 17, 18, 19, 20, 21};
 
 // Facies 6
 Curve Loop(23) = {199, 228, -227, -216, -200};
-epsx123 = 5.01e-4;
-epsy123 = 5.01e-4;
+epsx123 = delta_border_lines;
+epsy123 = delta_border_lines;
 Translate {epsx123, 2.5*epsy123, 0} { Duplicata{ Point{150}; } }
 Translate {epsx123, -epsy123, 0} { Duplicata{ Point{173}; } }
 Translate {-epsx123, -epsy123, 0} { Duplicata{ Point{164}; } }
@@ -1264,8 +1265,8 @@ Curve Loop(123) = {#Li121[]+1:#Li123[]};
 Plane Surface(23) = {23, 123};
 
 Curve Loop(24) = {220, 221, 222, 223, -224, -218, -217, -203, -202, -201, -139, -138, 192, 193, 195, -194};
-epsx124 = 5.01e-4;
-epsy124 = 5.01e-4;
+epsx124 = delta_border_lines;
+epsy124 = delta_border_lines;
 Translate {epsx124, 0, 0} { Duplicata{ Point{148}; } }
 Translate {epsx124, 0, 0} { Duplicata{ Point{192}; } }
 Translate {epsx124, 0, 0} { Duplicata{ Point{187}; } }
@@ -1292,8 +1293,8 @@ Curve Loop(124) = {#Li123[]+1:#Li124[]};
 Plane Surface(24) = {24, 124};
 
 Curve Loop(25) = {103, 99, -98, -97, -96, -95, -94, -93, -92, 91, -90, -89, -88, -87, -86, -85, -84, -83, -82, -81, -80, -79, 56, -310, 309, 311, 312, 313, -308, -307, 100, 101, 102};
-epsx125 = 5.01e-4;
-epsy125 = 5.01e-4;
+epsx125 = delta_border_lines;
+epsy125 = delta_border_lines;
 Translate {0.75*epsx125, 3*epsy125, 0} { Duplicata{ Point{50}; } }
 Translate {epsx125, 0, 0} { Duplicata{ Point{281}; } }
 Translate {epsx125, 0, 0} { Duplicata{ Point{49}; } }
@@ -1325,8 +1326,8 @@ Physical Surface("Facies 6", 6) = {23, 24, 25};
 
 // Facies 2
 Curve Loop(26) = {225, -237, -236, -235, -234, -233, 231, 232, -230, -229, -228, -198, 197};
-epsx126 = 5.01e-4;
-epsy126 = 5.01e-4;
+epsx126 = delta_border_lines;
+epsy126 = delta_border_lines;
 Translate {epsx126, epsy126, 0} { Duplicata{ Point{173}; } }
 Translate {epsx126, -epsy126, 0} { Duplicata{ Point{171}; } }
 Translate {-epsx126, -epsy126, 0} { Duplicata{ Point{182}; } }
@@ -1348,8 +1349,8 @@ Curve Loop(126) = {#Li125[]+1:#Li126[]};
 Plane Surface(26) = {26, 126};
 
 Curve Loop(27) = {193, -241, -240, -239, -238, -19, 133, 134, 135, 136, 137, 192};
-epsx127 = 5.01e-4;
-epsy127 = 5.01e-4;
+epsx127 = delta_border_lines;
+epsy127 = delta_border_lines;
 Translate {epsx127, epsy127, 0} { Duplicata{ Point{183}; } }
 Translate {epsx127, -epsy127, 0} { Duplicata{ Point{83}; } }
 Translate {0, -epsy127, 0} { Duplicata{ Point{84}; } }
@@ -1372,8 +1373,8 @@ Curve Loop(127) = {#Li126[]+1:#Li127[]};
 Plane Surface(27) = {27, 127};
 
 Curve Loop(28) = {14, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 42, -36, -35, -34, -33, -32, -31, -30, -29, -28, -27, -26, -25};
-epsx128 = 5.01e-4;
-epsy128 = 5.01e-4;
+epsx128 = delta_border_lines;
+epsy128 = delta_border_lines;
 Translate {epsx128, epsy128, 0} { Duplicata{ Point{51}; } }
 Translate {epsx128, -epsy128, 0} { Duplicata{ Point{1}; } }
 points = {2:12};
@@ -1396,8 +1397,8 @@ Curve Loop(128) = {#Li127[]+1:#Li128[]};
 Plane Surface(28) = {28, 128};
 
 Curve Loop(29) = {44, 45, 145, 146, 147, 148, -90, -89, -88, -87, -86, -85, -84, -83, -82, -81, -80, -79, -55, -54, -53, -52, -51, -50};
-epsx129 = 5.01e-4;
-epsy129 = 5.01e-4;
+epsx129 = delta_border_lines;
+epsy129 = delta_border_lines;
 Translate {epsx129, epsy129, 0} { Duplicata{ Point{94}; } }
 Translate {epsx129, -epsy129, 0} { Duplicata{ Point{16}; } }
 points = {18:22};
@@ -1425,8 +1426,8 @@ Curve Loop(129) = {#Li128[]+1:#Li129[]};
 Plane Surface(29) = {29, 129};
 
 Curve Loop(30) = {57, -310, 149, 150, 151, 152, 153, 154, 155, 156, -3, -67, -66, -65, -64, -63, -62, -61, -60, -59, -58};
-epsx130 = 5.01e-4;
-epsy130 = 5.01e-4;
+epsx130 = delta_border_lines;
+epsy130 = delta_border_lines;
 Translate {epsx130, epsy130, 0} { Duplicata{ Point{99}; } }
 Translate {epsx130, -epsy130, 0} { Duplicata{ Point{253}; } }
 points = {24:33};
