@@ -34,6 +34,7 @@ def pyopmspe11():
     dic["showpywarn"] = int(cmdargs["showpywarn"])  # Show or hidde python warnings
     dic["latex"] = int(cmdargs["latex"])  # LaTeX formatting
     dic["subfolders"] = int(cmdargs["subfolders"])  # Create subfolders
+    dic["newfips"] = int(cmdargs["numfip"]) == 1  # Fipnum type
     if dic["showpywarn"] != 1:
         warnings.warn = lambda *args, **kwargs: None
     # If the compare plots are generated, then we exit right afterwards
@@ -182,6 +183,12 @@ def load_parser():
         default=1,
         help="Set to 0 to not create the subfolders deck, flow, data, and figures, i.e., to "
         "write all generated files in the output directory ('1' by default).",
+    )
+    parser.add_argument(
+        "-n",
+        "--numfip",
+        default=0,
+        help="Set to 1 for sgm fipnums ('0' by default).",
     )
     return vars(parser.parse_known_args()[0])
 
