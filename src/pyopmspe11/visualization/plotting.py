@@ -73,6 +73,12 @@ def main():
         "[y]) ('5' by default); otherwise, times separated by commas.",
     )
     parser.add_argument(
+        "-n",
+        "--neighbourhood",
+        default="",
+        help="Focus on the lower region ('' by default, i.e., all reservoir)",
+    )
+    parser.add_argument(
         "-l",
         "--latex",
         default=1,
@@ -88,6 +94,7 @@ def main():
     dic["latex"] = int(cmdargs["latex"])  # LaTeX formatting
     dic["subfolders"] = int(cmdargs["subfolders"]) == 1  # Create subfolders
     dic["time"] = np.genfromtxt(StringIO(cmdargs["time"]), delimiter=",", dtype=int)
+    dic["lower"] = True if cmdargs["neighbourhood"].strip() else False  # Lower model
     plot_results(dic)
     print(f"The png figures have been saved on {dic['where']}")
 
@@ -493,6 +500,8 @@ def ini_quantity_plot(dic):
     """
     if dic["case"] != "spe11a":
         dic["fig"] = plt.figure(figsize=(50, 3 * len(dic["ptimes"])))
+        if dic["lower"]:
+             dic["fig"] = plt.figure(figsize=(100, 3 * len(dic["ptimes"])))
     else:
         dic["fig"] = plt.figure(figsize=(45, 6.5 * len(dic["ptimes"])), dpi=80)
     for name in ["plot", "min", "max", "sum"]:
@@ -633,6 +642,8 @@ def dense_data(dic):
                         ticks=vect,
                         format=lambda x, _: f"{x:.2e}",
                     )
+                if dic["lower"]:
+                    axis.set_ylim([0,525])
             dic["fig"].savefig(
                 f"{dic['where']}/{dic['case']}_{quantity}_2Dmaps.png",
                 bbox_inches="tight",
