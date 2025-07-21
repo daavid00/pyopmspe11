@@ -198,6 +198,9 @@ RGMDS
 BWPR
 % for sensor in dic["sensorijk"]: 
 ${sensor[0]+1} ${sensor[1]+1} ${sensor[2]+1} /
+% if dic["lower"]:
+<% break %>
+% endif
 % endfor
 /
 ----------------------------------------------------------------------------
@@ -278,6 +281,9 @@ ${dic['wellijk'][i][0]} ${dic['wellijk'][i][1]} ${dic['wellijk'][i][2]} GAS ${f"
 % else:
 ${dic['wellijk'][i][0]} ${dic['wellijk'][i][1]} ${dic['wellijk'][i][2]} WATER ${f"{dic['inj'][j][3+3*i] * 86400:E}"} 1* ${f"{dic['inj'][j][4+3*i]:E}"} /
 % endif
+% endif
+% if dic["lower"]:
+<% break %>
 % endif
 % endfor
 /
