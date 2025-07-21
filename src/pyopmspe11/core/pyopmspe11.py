@@ -33,6 +33,7 @@ def pyopmspe11():
     )  # Temporal resolution to write the sparse and performance data
     dic["showpywarn"] = int(cmdargs["showpywarn"])  # Show or hidde python warnings
     dic["latex"] = int(cmdargs["latex"])  # LaTeX formatting
+    dic["lower"] = bool(cmdargs["neighbourhood"].strip())  # Lower model
     dic["subfolders"] = int(cmdargs["subfolders"])  # Create subfolders
     if dic["showpywarn"] != 1:
         warnings.warn = lambda *args, **kwargs: None
@@ -182,6 +183,12 @@ def load_parser():
         default=1,
         help="Set to 0 to not create the subfolders deck, flow, data, and figures, i.e., to "
         "write all generated files in the output directory ('1' by default).",
+    )
+    parser.add_argument(
+        "-n",
+        "--neighbourhood",
+        default="",
+        help="Focus on the lower region ('' by default, i.e., all reservoir)",
     )
     return vars(parser.parse_known_args()[0])
 
