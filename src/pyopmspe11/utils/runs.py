@@ -47,6 +47,7 @@ def plotting(dic):
         "-l " + f"{dic['latex']}",
         "-f " + f"{dic['subfolders']}",
         "-t " + f"{dic['time_data']}",
+        "-n " + f"{'lower' if dic['lower'] else ''}",
     ]
     print("\nPlot: Generation of png figures, please wait.")
     prosc = subprocess.run(plot_exe, check=True)
@@ -77,6 +78,7 @@ def data(dic):
         "-u " + f"{dic['use']}",
         "-f " + f"{dic['subfolders']}",
         "-s " + f"{dic['showpywarn']}",
+        "-n " + f"{'lower' if dic['lower'] else ''}",
     ]
     print(
         "\nData: Generation of csv files following the SPE11 benchmark format, please wait."
