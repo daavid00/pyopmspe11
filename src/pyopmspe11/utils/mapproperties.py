@@ -552,11 +552,12 @@ def locate_wells_sensors(dic):
         + dic["sensorijk"][0][1] * dic["noCells"][0]
         + dic["sensorijk"][0][2] * dic["noCells"][0] * dic["noCells"][1]
     ] = "8"
-    dic["fipnum"][
-        dic["sensorijk"][1][0]
-        + dic["sensorijk"][1][1] * dic["noCells"][0]
-        + dic["sensorijk"][1][2] * dic["noCells"][0] * dic["noCells"][1]
-    ] = "9"
+    if not dic["lower"]:
+        dic["fipnum"][
+            dic["sensorijk"][1][0]
+            + dic["sensorijk"][1][1] * dic["noCells"][0]
+            + dic["sensorijk"][1][2] * dic["noCells"][0] * dic["noCells"][1]
+        ] = "9"
 
 
 def boxes(dic, x_c, z_c, idx, fluxnum):
@@ -1017,8 +1018,9 @@ def corner(dic):
             dic["ymy"], len(dic["ymy"]) - 1, dic["ymy"][-1] - dic["widthBuffer"]
         )
     dic["noCells"][1] = len(dic["ymy"]) - 1
+    shf = 15 if dic["lower"] else 0
     for xcor in dic["xmx"]:
-        for _, lcor in enumerate(lines):
+        for _, lcor in enumerate(lines[shf:]):
             xcoord.append(xcor)
             idx = pd.Series([abs(ii[0] - xcor) for ii in lcor]).argmin()
             if lcor[idx][0] < xcor:
@@ -1046,7 +1048,7 @@ def corner(dic):
     dic["noCells"][0], dic["noCells"][2] = n_x, n_z
     # Refine the grid
     xcoord, zcoord, dic["noCells"][0], dic["noCells"][2] = refinement_z(
-        xcoord, zcoord, dic["noCells"][0], dic["noCells"][2], dic["z_n"]
+        xcoord, zcoord, dic["noCells"][0], dic["noCells"][2], dic["z_n"][shf:]
     )
     dic["xmx"] = np.array(dic["xmx"])
     dic["ymy_center"] = 0.5 * (np.array(dic["ymy"])[1:] + np.array(dic["ymy"])[:-1])
