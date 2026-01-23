@@ -2,7 +2,9 @@
 Convergence
 ***********
 
-This section describes how to run the cases in the paper `Exploring Convergence and Its Limits in Case B of the 11th SPE Comparative Solution Project, to appear in SPE J`.
+This section describes how to run the cases in the paper: 
+
+* Landa-Marbán, D., Lie, K.-A., Lye, K. O., Møyner, O., Rasmussen, A. F., and T. H. Sandve (2026). Exploring Convergence and Its Limits in Case B of the 11th SPE Comparative Solution Project. SPE J. `https://doi.org/10.2118/231853-PA <https://doi.org/10.2118/231853-PA>`_.
 
 To run the cases in the terminal, inside the `convergence <https://github.com/OPM/pyopmspe11/blob/main/convergence>`_ folder:
 
