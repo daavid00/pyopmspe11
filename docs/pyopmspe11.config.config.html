@@ -93,68 +93,6 @@
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pyopmspe11.config.config.</span></span><span class="sig-name descname"><span class="pre">Config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">fol:</span> <span class="pre">str,</span> <span class="pre">generate:</span> <span class="pre">str,</span> <span class="pre">mode:</span> <span class="pre">str,</span> <span class="pre">resolution:</span> <span class="pre">str,</span> <span class="pre">time_data:</span> <span class="pre">str,</span> <span class="pre">dt_data:</span> <span class="pre">float,</span> <span class="pre">lower:</span> <span class="pre">bool,</span> <span class="pre">subfolders:</span> <span class="pre">str,</span> <span class="pre">flow:</span> <span class="pre">str,</span> <span class="pre">spe11:</span> <span class="pre">str,</span> <span class="pre">version:</span> <span class="pre">str,</span> <span class="pre">model:</span> <span class="pre">str,</span> <span class="pre">grid:</span> <span class="pre">str,</span> <span class="pre">dims:</span> <span class="pre">~typing.List[float],</span> <span class="pre">x_n:</span> <span class="pre">~typing.List[int],</span> <span class="pre">y_n:</span> <span class="pre">~typing.List[int],</span> <span class="pre">z_n:</span> <span class="pre">~typing.List[int],</span> <span class="pre">temperature:</span> <span class="pre">~typing.List[float],</span> <span class="pre">datum:</span> <span class="pre">float,</span> <span class="pre">pressure:</span> <span class="pre">float,</span> <span class="pre">kzMult:</span> <span class="pre">float,</span> <span class="pre">diffusion:</span> <span class="pre">~typing.List[float],</span> <span class="pre">dispersion:</span> <span class="pre">~typing.List[float],</span> <span class="pre">radius:</span> <span class="pre">~typing.List[float],</span> <span class="pre">wellCoord:</span> <span class="pre">~typing.List[~typing.List[float]],</span> <span class="pre">krw:</span> <span class="pre">str,</span> <span class="pre">krn:</span> <span class="pre">str,</span> <span class="pre">pcap:</span> <span class="pre">str,</span> <span class="pre">s_w:</span> <span class="pre">str,</span> <span class="pre">safu:</span> <span class="pre">~typing.List[~typing.List[float]],</span> <span class="pre">rock:</span> <span class="pre">~typing.List[~typing.List[float]],</span> <span class="pre">inj:</span> <span class="pre">~typing.List[~typing.List[float]],</span> <span class="pre">spe11aBC:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">drsdtcon:</span> <span class="pre">~typing.List[~typing.List[str]]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">elevation:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">backElevation:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">rockCond:</span> <span class="pre">~typing.List[float]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">widthBuffer:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">rockExtra:</span> <span class="pre">~typing.List[float]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">pvAdded:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">wellCoordF:</span> <span class="pre">~typing.List[~typing.List[float]]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">maxelevation:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">cut:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">nxyz:</span> <span class="pre">~typing.List[int]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">boxa:</span> <span class="pre">~typing.List[~typing.List[float]]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">boxb:</span> <span class="pre">~typing.List[~typing.List[float]]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">boxc:</span> <span class="pre">~typing.List[~typing.List[float]]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">sensors:</span> <span class="pre">~typing.List[~typing.List[float]]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">sensorijk:</span> <span class="pre">~typing.List[~typing.List[int]]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">wellijk:</span> <span class="pre">~typing.List[~typing.List[int]]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">wellijkf:</span> <span class="pre">~typing.List[~typing.List[int]]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">wellkh:</span> <span class="pre">~typing.List[int]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">pat:</span> <span class="pre">~pathlib.Path</span> <span class="pre">=</span> <span class="pre">PosixPath('/Users/dmar/cssr-tools/pyopmspe11/src/pyopmspe11'),</span> <span class="pre">tuning:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">deckfol:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'output',</span> <span class="pre">compact_dx:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyopmspe11.config.config.Config" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Combines CLI options, TOML inputs, and derived runtime settings</p>
-<dl class="field-list simple">
-<dt class="field-odd">Attributes<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>backElevation</strong></dt><dd></dd>
-<dt><strong>boxa</strong></dt><dd></dd>
-<dt><strong>boxb</strong></dt><dd></dd>
-<dt><strong>boxc</strong></dt><dd></dd>
-<dt><strong>compact_dx</strong></dt><dd></dd>
-<dt><strong>cut</strong></dt><dd></dd>
-<dt><strong>datum</strong></dt><dd></dd>
-<dt><strong>deckfol</strong></dt><dd></dd>
-<dt><strong>diffusion</strong></dt><dd></dd>
-<dt><strong>dims</strong></dt><dd></dd>
-<dt><strong>dispersion</strong></dt><dd></dd>
-<dt><strong>drsdtcon</strong></dt><dd></dd>
-<dt><strong>dt_data</strong></dt><dd></dd>
-<dt><strong>elevation</strong></dt><dd></dd>
-<dt><strong>flow</strong></dt><dd></dd>
-<dt><strong>fol</strong></dt><dd></dd>
-<dt><strong>generate</strong></dt><dd></dd>
-<dt><strong>grid</strong></dt><dd></dd>
-<dt><strong>inj</strong></dt><dd></dd>
-<dt><strong>krn</strong></dt><dd></dd>
-<dt><strong>krw</strong></dt><dd></dd>
-<dt><strong>kzMult</strong></dt><dd></dd>
-<dt><strong>lower</strong></dt><dd></dd>
-<dt><strong>maxelevation</strong></dt><dd></dd>
-<dt><strong>mode</strong></dt><dd></dd>
-<dt><strong>model</strong></dt><dd></dd>
-<dt><strong>nxyz</strong></dt><dd></dd>
-<dt><strong>pat</strong></dt><dd></dd>
-<dt><strong>pcap</strong></dt><dd></dd>
-<dt><strong>pressure</strong></dt><dd></dd>
-<dt><strong>pvAdded</strong></dt><dd></dd>
-<dt><strong>radius</strong></dt><dd></dd>
-<dt><strong>resolution</strong></dt><dd></dd>
-<dt><strong>rock</strong></dt><dd></dd>
-<dt><strong>rockCond</strong></dt><dd></dd>
-<dt><strong>rockExtra</strong></dt><dd></dd>
-<dt><strong>s_w</strong></dt><dd></dd>
-<dt><strong>safu</strong></dt><dd></dd>
-<dt><strong>sensorijk</strong></dt><dd></dd>
-<dt><strong>sensors</strong></dt><dd></dd>
-<dt><strong>spe11</strong></dt><dd></dd>
-<dt><strong>spe11aBC</strong></dt><dd></dd>
-<dt><strong>subfolders</strong></dt><dd></dd>
-<dt><strong>temperature</strong></dt><dd></dd>
-<dt><strong>time_data</strong></dt><dd></dd>
-<dt><strong>tuning</strong></dt><dd></dd>
-<dt><strong>version</strong></dt><dd></dd>
-<dt><strong>wellCoord</strong></dt><dd></dd>
-<dt><strong>wellCoordF</strong></dt><dd></dd>
-<dt><strong>wellijk</strong></dt><dd></dd>
-<dt><strong>wellijkf</strong></dt><dd></dd>
-<dt><strong>wellkh</strong></dt><dd></dd>
-<dt><strong>widthBuffer</strong></dt><dd></dd>
-<dt><strong>x_n</strong></dt><dd></dd>
-<dt><strong>y_n</strong></dt><dd></dd>
-<dt><strong>z_n</strong></dt><dd></dd>
-</dl>
-</dd>
-</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyopmspe11.config.config.Config.backElevation">
 <span class="sig-name descname"><span class="pre">backElevation</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#pyopmspe11.config.config.Config.backElevation" title="Link to this definition"></a></dt>

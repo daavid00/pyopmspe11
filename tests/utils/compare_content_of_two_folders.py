@@ -38,7 +38,7 @@ def main():
     args = vars(parser.parse_known_args()[0])
     afolder = args["afolder"]
     bfolder = args["bfolder"]
-    extensions = (args["extensions"].strip()).split(",")
+    extensions = (args["extensions"]).split(",")
     for root, _, files in os.walk(afolder):
         for file in files:
             for ext in extensions:
@@ -47,9 +47,7 @@ def main():
                     bfile = os.path.join(
                         bfolder + "/" + "/".join((root.split("/")[1:])), file
                     )
-                    assert os.path.join(
-                        bfolder + "/" + "/".join((root.split("/")[1:])), file
-                    ), f"File {bfile} does not exist"
+                    assert os.path.isfile(bfile), f"File {bfile} does not exist"
                     is_equal = filecmp.cmp(afile, bfile, shallow=False)
                     if not is_equal:
                         print(f"Config mismatch for {afile} and {bfile}")
