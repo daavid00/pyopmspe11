@@ -61,7 +61,7 @@ The following input lines in the configuration file are:
     150 10            #Maximum elevation difference (relative to the baseline gradient) of the arch in the y direction [m] and back boundary elevation [m] (for spe11c) 
 
 In line 5 you specify if you are using OPM Flow from the master branch or from the latest stable release (OPM-flow 2026.04 release).
-This since there are continuous changues in the OPM master branch. Then we 
+This since there are continuous changes in the OPM master branch. Then we 
 will keep updating the decks for using Flow from master and also we will keep the framework to produce decks compatible for the latest OPM stable release.
 The immiscible model allows for faster prototyping while the complete model includes dissolution of the components in the
 gas and liquid phases, in addition to thermal effects (the isothermal model neglects the thermal effects). Details on the convective model can be found in `Mykkeltvedt et al. (2025) <https://link.springer.com/article/10.1007/s11242-024-02141-5>`_. 
@@ -147,7 +147,7 @@ The last part of the configuration file sets the wells radius, location, and the
 .. note::
     If tuning is enabled by the OPM flag **--enable-tuning**, then the TUNING keywords are added to the deck, see the OPM Flow manual for the definitions of all 
     34 different options and their default values. To set this values, then one can add per injection line in the configuration file a string with the corresponding values, e.g., to set a 
-    maximum time step of 10 days at the beginning og the injection:
+    maximum time step of 10 days at the beginning of the injection:
 
     .. code-block:: python
 

@@ -3,7 +3,7 @@
 # pylint: disable=R0912, R0913, R0914, R0915, R0917
 
 """
-Utiliy functions to write necessary files and variables
+Utility functions to write necessary files and variables
 """
 
 import subprocess
