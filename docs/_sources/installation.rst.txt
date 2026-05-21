@@ -123,7 +123,7 @@ Then, you can try to install flow (v2026.02) by simply typing:
 
     brew install cssr-tools/opm/opm-simulators
 
-You can check if the installation of OPM Flow succeded by typing in the terminal **flow \-\-help**.
+You can check if the installation of OPM Flow succeeded by typing in the terminal **flow \-\-help**.
 
 .. tip::
     See the actions in the `cssr-tools/homebrew-opm <https://github.com/cssr-tools/homebrew-opm/actions>`_ repository. 

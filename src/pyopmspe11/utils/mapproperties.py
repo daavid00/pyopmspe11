@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 # pylint: disable=C0302, R0912, R0913, R0914, R0915, R0917, E1102
 
-"""Utiliy function for the grid and locations in the geological models."""
+"""Utility function for the grid and locations in the geological models."""
 
 import csv
 import numpy as np

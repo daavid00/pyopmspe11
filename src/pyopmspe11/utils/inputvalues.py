@@ -20,7 +20,13 @@ from pyopmspe11.config.config import Config
 
 
 def process_input(cli: dict) -> Config:
-    """Process configuration input."""
+    """Process configuration input.
+
+    The function constructs a ``Config`` object from CLI and file input, then
+    mutates it in place during post-processing (for example via
+    ``setcaseproperties``, ``postprocesstoml``, and optional tuning flag
+    updates) before returning it.
+    """
     msg1 = (
         "\nAfter the pyopmspe11 2025.04 release, the CO2STORE functionality only "
         + "uses the gaswater implementation, not the gasoil implementation.\nThen "
@@ -66,7 +72,7 @@ def process_input(cli: dict) -> Config:
 
 
 def load_config_txt(lines: list) -> dict:
-    """Read the txt  (the types are checked when creating the Config data class)"""
+    """Read the txt (the types are checked when creating the Config data class)"""
     dic: dict[str, Any] = {"flow": str(lines[1])[2:-2]}
     row = lines[4][0].strip().split()
     dic["spe11"] = row[0]
