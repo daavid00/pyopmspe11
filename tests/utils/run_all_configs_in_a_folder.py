@@ -4,6 +4,7 @@
 """Generate all OPM input decks submitted to the benchmark (run this inside the benchmark folder)"""
 
 import os
+import shutil
 import subprocess
 
 
@@ -15,7 +16,7 @@ def main():
                 continue
             fol = f"spe11{x}/{i}"
             if os.path.isdir(fol):
-                subprocess.run(["rm", "-rf", fol], check=True)
+                shutil.rmtree(fol)
     folder = os.path.abspath(".")
     for root, _, files in os.walk(folder):
         for i, file in enumerate(files):

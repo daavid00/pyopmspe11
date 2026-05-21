@@ -18,15 +18,15 @@ To install the _pyopmspe11_ executable from the development version:
 pip install git+https://github.com/OPM/pyopmspe11.git
 ```
 
-If you are interested in a specific version (e.g., v2025.10) or in modifying the source code, then you can clone the repository and install the Python requirements in a virtual environment with the following commands:
+If you are interested in a specific version (e.g., v2026.04) or in modifying the source code, then you can clone the repository and install the Python requirements in a virtual environment with the following commands:
 
 ```bash
 # Clone the repo
 git clone https://github.com/OPM/pyopmspe11.git
 # Get inside the folder
 cd pyopmspe11
-# For a specific version (e.g., v2025.10), or skip this step (i.e., edge version)
-git checkout v2025.10
+# For a specific version (e.g., v2026.04), or skip this step (i.e., edge version)
+git checkout v2026.04
 # Create virtual environment (to specific Python, python3.14 -m venv vpyopmspe11)
 python3 -m venv vpyopmspe11
 # Activate virtual environment
@@ -42,7 +42,7 @@ pip install -r dev-requirements.txt
 To generate only the input files (e.g., .DATA, .GRID, .INC), this does not required to have OPM Flow installed, and in principle should work in Windows without using the subsystem for Linux. Then, one could always generate a deck with the grid and all include files, and modify them in order to use other simulators different than OPM Flow.
 
 If you are insterested in running the cases via ***pyopmspe11*** and generating the CSV files with the benchmark format, then you will first need to install
-* Flow (https://opm-project.org, Release 2025.10 or current master branches)
+* Flow (https://opm-project.org, Release 2026.04 or current master branches)
 
 See the [_installation_](https://OPM.github.io/pyopmspe11/installation.html) for further details on building OPM Flow from the master branches in Linux, Windows (via [_WSL_](https://learn.microsoft.com/en-us/windows/wsl/)), and macOS, as well as the LaTeX (optional) dependency.
 

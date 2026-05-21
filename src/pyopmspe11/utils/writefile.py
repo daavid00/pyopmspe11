@@ -7,6 +7,7 @@ Utiliy functions to write necessary files and variables
 """
 
 import subprocess
+from pathlib import Path
 from dataclasses import asdict
 import numpy as np
 from numpy.typing import NDArray
@@ -216,7 +217,7 @@ def opm_files(cfg: Config) -> None:
     result = subprocess.run(["python3", script], check=True)
     if result.returncode != 0:
         raise ValueError(f"Invalid result: {result.returncode}")
-    subprocess.run(["rm", "-rf", script], check=True)
+    Path(script).unlink(missing_ok=True)
 
 
 def write_regular_spe11c_grid(

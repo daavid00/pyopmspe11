@@ -13,14 +13,10 @@ from io import StringIO
 from typing import Any
 import subprocess
 from subprocess import PIPE
+import tomllib
 import numpy as np
 
 from pyopmspe11.config.config import Config
-
-try:
-    import tomllib
-except ImportError:
-    pass
 
 
 def process_input(cli: dict) -> Config:
@@ -233,7 +229,7 @@ def check_deck(cfg: Config) -> None:
     for forbidden in ["2025.04", "2024.10", "2024.04"]:
         if flow_version == forbidden:
             print(
-                f"\nYou are using Flow {forbidden}. Please update to Flow 2025.10, "
+                f"\nYou are using Flow {forbidden}. Please update to Flow 2026.04, "
                 + "or build Flow from the master GitHub branches.\n"
             )
             sys.exit()
