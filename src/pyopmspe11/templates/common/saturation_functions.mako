@@ -10,33 +10,33 @@ import numpy as np
 
 def s_w_points(npoints):
     """Points to evaluate the saturation functions"""
-    return ${dic['s_w'].strip()}
+    return ${s_w.strip()}
 
 
 def krw(s_w, swi):
     """Wetting relative permeability"""
-    return ${dic['krw'].strip()}
+    return ${krw_expr.strip()}
 
 
 def krn(s_w, sni):
     """CO2 relative permeability"""
-    return ${dic['krn'].strip()}
+    return ${krn_expr.strip()}
 
 
 def pcap(s_w, swi, pen, penmax):
     """Capillary pressure"""
-    return ${dic['pcap'].strip()}
+    return ${pcap_expr.strip()}
 
 
 def safu_evaluation():
     """Saturation function assignation"""
 
     # Properties: swi, sni, pen, penmax, npoints
-    safu = [[0.0] * 5 for _ in range(${len(dic['safu'])})]
-% for i, _ in enumerate(dic['safu']):
+    safu = [[0.0] * 5 for _ in range(${len(safu)})]
+% for i, _ in enumerate(safu):
 <%
 row = "["
-for val in dic['safu'][i]:
+for val in safu[i]:
     row += f"{val}, "
 %>\
     safu[${i}] = ${row[:-2]}${"]"}
@@ -61,7 +61,7 @@ for val in dic['safu'][i]:
         values += "/\n"
 
     with open(
-        "${dic['deckfol']}/TABLES.INC",
+        "${deckfol}/TABLES.INC",
         "w",
         encoding="utf8",
     ) as f:
