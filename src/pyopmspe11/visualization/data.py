@@ -9,6 +9,7 @@ import csv
 import sys
 from io import StringIO
 from dataclasses import dataclass
+from contextlib import nullcontext
 from shapely.geometry import Polygon
 from alive_progress import alive_bar
 from rtree import index
@@ -789,9 +790,15 @@ def build_general_dense_mapping(
             idx.insert(rid, poly.bounds)
             rid += 1
     print("Processing polygon intersections between simulation and reporting grids")
-    with alive_bar(len(simpoly), bar="fish") as bar_animation:
+    show_progress = sys.stdout.isatty()
+    if show_progress:
+        bar_ctx = alive_bar(len(simpoly), bar="fish")
+    else:
+        bar_ctx = nullcontext()
+    with bar_ctx as bar_animation:
         for sim_cell, poly_s in enumerate(simpoly):
-            bar_animation()
+            if show_progress:
+                bar_animation()
             if poly_s.area > 0.0:
                 area_s = poly_s.area
                 for tgt in idx.intersection(poly_s.bounds):
@@ -801,9 +808,15 @@ def build_general_dense_mapping(
             else:
                 cell_ind[sim_cell] = cell_ind[sim_cell - 1]
     print("Finding the cell indices between simulation and reporting grids")
-    with alive_bar(len(refxgrid), bar="fish") as bar_animation:
+    show_progress = sys.stdout.isatty()
+    if show_progress:
+        bar_ctx = alive_bar(len(refxgrid), bar="fish")
+    else:
+        bar_ctx = nullcontext()
+    with bar_ctx as bar_animation:
         for rep, (xc, zc) in enumerate(zip(refxgrid, refzgrid)):
-            bar_animation()
+            if show_progress:
+                bar_animation()
             cell_cent[rep] = np.nanargmin(np.abs(simxcent - xc) + np.abs(simzcent - zc))
     return cell_ind, cell_cent
 

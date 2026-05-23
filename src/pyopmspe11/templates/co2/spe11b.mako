@@ -4,13 +4,13 @@
 RUNSPEC
 ----------------------------------------------------------------------------
 DIMENS 
-${dic['nxyz'][0]} ${dic['nxyz'][1]} ${dic['nxyz'][2]} /
+${nxyz[0]} ${nxyz[1]} ${nxyz[2]} /
 
 EQLDIMS
 /
 
 TABDIMS
-% if dic['model'] != 'convective':
+% if model != 'convective':
 7 /
 % else:
 7 7 /
@@ -19,21 +19,21 @@ TABDIMS
 WATER
 GAS
 CO2STORE
-% if dic['model'] != 'immiscible':
+% if model != 'immiscible':
 DISGASW
 VAPWAT
-${"DIFFUSE\n" if(dic["diffusion"][0] + dic["diffusion"][1]) > 0 else ""}\
+${"DIFFUSE\n" if(diffusion[0] + diffusion[1]) > 0 else ""}\
 % endif
-${"THERMAL\n" if dic["model"] in ["complete", "convective"] else ""}\
+${"THERMAL\n" if model in ["complete", "convective"] else ""}\
 
 METRIC
 
 START
 1 JAN 2025 /
-% if sum(dic['radius']) > 0:
+% if sum(radius) > 0:
 
 WELLDIMS
-${len(dic['wellijk'])} ${dic['nxyz'][2]} ${len(dic['wellijk'])} ${len(dic['wellijk'])} /
+${len(wellijk)} ${nxyz[2]} ${len(wellijk)} ${len(wellijk)} /
 % endif
 
 UNIFOUT
@@ -42,85 +42,85 @@ GRID
 ----------------------------------------------------------------------------
 INIT
 
-% if dic["grid"] == 'corner-point':
+% if grid == 'corner-point':
 INCLUDE
 GRID.INC /
-% elif dic["grid"] == 'tensor':
+% elif grid == 'tensor':
 INCLUDE
 DX.INC /
 
 DY 
-${dic['nxyz'][0]*dic['nxyz'][1]*dic['nxyz'][2]}*${dic['dims'][1]} /
+${nxyz[0]*nxyz[1]*nxyz[2]}*${dims[1]} /
 
 INCLUDE
 DZ.INC /
 
 TOPS
-% if dic["lower"]:
-${dic['nxyz'][0]}*${dic["dims"][2] - dic['cut']} /
+% if lower:
+${nxyz[0]}*${dims[2] - cut} /
 % else:
-${dic['nxyz'][0]}*0 /
+${nxyz[0]}*0 /
 % endif
 % else:
-% if dic["compact_dx"]:
+% if compact_dx:
 INCLUDE
 DX.INC /
 % else:
 DX 
-${dic['nxyz'][0]*dic['nxyz'][1]*dic['nxyz'][2]}*${dic['dims'][0]/dic['nxyz'][0]} /
+${nxyz[0]*nxyz[1]*nxyz[2]}*${dims[0]/nxyz[0]} /
 % endif
 
 DY 
-${dic['nxyz'][0]*dic['nxyz'][1]*dic['nxyz'][2]}*${dic['dims'][1]/dic['nxyz'][1]} /
+${nxyz[0]*nxyz[1]*nxyz[2]}*${dims[1]/nxyz[1]} /
 
 DZ 
-${dic['nxyz'][0]*dic['nxyz'][1]*dic['nxyz'][2]}*${dic['cut']/dic['nxyz'][2] if dic["lower"] else dic['dims'][2]/dic['nxyz'][2]} /
+${nxyz[0]*nxyz[1]*nxyz[2]}*${cut/nxyz[2] if lower else dims[2]/nxyz[2]} /
 
 TOPS
-% if dic["lower"]:
-${dic['nxyz'][0]}*${dic["dims"][2] - dic['cut']} /
+% if lower:
+${nxyz[0]}*${dims[2] - cut} /
 % else:
-${dic['nxyz'][0]}*0 /
+${nxyz[0]}*0 /
 % endif
 % endif
 
 INCLUDE
 FLUXNUM.INC /
-% if dic['model'] != 'immiscible' and sum(dic["dispersion"]) > 0:
+% if model != 'immiscible' and sum(dispersion) > 0:
 
 DISPERC
-${dic['nxyz'][0]*dic['nxyz'][1]*dic['nxyz'][2]}*0 /
+${nxyz[0]*nxyz[1]*nxyz[2]}*0 /
 % endif
 
 EQUALREG
 % for i in range(7):
-PORO    ${f"{dic['rock'][i][1]:E}"} ${i+1} F /
+PORO    ${f"{rock[i][1]:E}"} ${i+1} F /
 % endfor
 % for i in range(7):
-PERMX   ${f"{dic['rock'][i][0]:E}"} ${i+1} F /
+PERMX   ${f"{rock[i][0]:E}"} ${i+1} F /
 % endfor
 % for i in range(7):
-PERMY   ${f"{dic['rock'][i][0]:E}"} ${i+1} F /
+PERMY   ${f"{rock[i][0]:E}"} ${i+1} F /
 % endfor
 % for i in range(7):
-PERMZ   ${f"{dic['rock'][i][0]*dic['kzMult']:E}"} ${i+1} F /
+PERMZ   ${f"{rock[i][0]*kzMult:E}"} ${i+1} F /
 % endfor
-% if dic['model'] in ["complete", "convective"]:
+% if model in ["complete", "convective"]:
 % for i in range(7):
-THCONR  ${f"{dic['rockCond'][i]:E}"} ${i+1} F /
+THCONR  ${f"{rockCond[i]:E}"} ${i+1} F /
 % endfor
 % endif
-% if dic['model'] != 'immiscible' and sum(dic["dispersion"]) > 0:
+% if model != 'immiscible' and sum(dispersion) > 0:
 % for i in range(7):
-DISPERC ${f"{dic['dispersion'][i]:E}"} ${i+1} F /
+DISPERC ${f"{dispersion[i]:E}"} ${i+1} F /
 % endfor
 % endif
 /
-% if dic['model'] in ["complete", "convective"]:
+% if model in ["complete", "convective"]:
 
 BCCON 
-1 1 ${dic['nxyz'][0]} 1 1 1 1 Z- /
-2 1 ${dic['nxyz'][0]} 1 1 ${dic['nxyz'][2]} ${dic['nxyz'][2]} Z /
+1 1 ${nxyz[0]} 1 1 1 1 Z- /
+2 1 ${nxyz[0]} 1 1 ${nxyz[2]} ${nxyz[2]} Z /
 /
 % endif
 ----------------------------------------------------------------------------
@@ -133,30 +133,30 @@ PROPS
 ----------------------------------------------------------------------------
 INCLUDE
 TABLES.INC /
-% if dic['model'] != 'immiscible':
-% if (dic["diffusion"][0] + dic["diffusion"][1]) > 0:
+% if model != 'immiscible':
+% if (diffusion[0] + diffusion[1]) > 0:
 
 DIFFAWAT
-${dic["diffusion"][0]} ${dic["diffusion"][0]} /
-% if dic['model'] == 'convective':
+${diffusion[0]} ${diffusion[0]} /
+% if model == 'convective':
 % for i in range(6):
 /
 % endfor
 % endif
 
 DIFFAGAS
-${dic["diffusion"][1]} ${dic["diffusion"][1]} /
-% if dic['model'] == 'convective':
+${diffusion[1]} ${diffusion[1]} /
+% if model == 'convective':
 % for i in range(6):
 /
 % endfor
 % endif
 % endif
 
-% if dic['model'] in ["complete", "convective"]:
+% if model in ["complete", "convective"]:
 SPECROCK
-${min(dic["temperature"][0], dic["temperature"][1])} ${dic["rockExtra"][0]*dic["rockExtra"][1]}
-${max(dic["temperature"][0], dic["temperature"][1]) if dic["temperature"][0]!=dic["temperature"][1] else dic["temperature"][0]+1} ${dic["rockExtra"][0]*dic["rockExtra"][1]} / --Table 1
+${min(temperature[0], temperature[1])} ${rockExtra[0]*rockExtra[1]}
+${max(temperature[0], temperature[1]) if temperature[0]!=temperature[1] else temperature[0]+1} ${rockExtra[0]*rockExtra[1]} / --Table 1
 % for i in range(6): 
 / --Defaulted to table 1
 % endfor
@@ -174,7 +174,7 @@ FLUXNUM SATNUM /
 
 INCLUDE
 FIPNUM.INC /
-% if dic['model'] == 'convective':
+% if model == 'convective':
 
 COPY
 SATNUM PVTNUM /
@@ -184,14 +184,14 @@ SATNUM PVTNUM /
 SOLUTION
 ---------------------------------------------------------------------------
 EQUIL
-${dic['dims'][2]-dic['datum']} ${dic['pressure']/1.E5} 0 0 0 0 1 1 0 /
+${dims[2]-datum} ${pressure/1.E5} 0 0 0 0 1 1 0 /
 
 RPTRST
-BASIC=2 DEN PCGW ${f"RSWSAT /" if dic['model'] != 'immiscible' else "/"}
+BASIC=2 DEN PCGW ${f"RSWSAT /" if model != 'immiscible' else "/"}
 
 RTEMPVD
-${"".join([' ' for _ in range(len(str(dic['dims'][2]))-1)])}0 ${dic["temperature"][1]}
-${dic['dims'][2]} ${dic["temperature"][0]} /
+${"".join([' ' for _ in range(len(str(dims[2]))-1)])}0 ${temperature[1]}
+${dims[2]} ${temperature[0]} /
 ----------------------------------------------------------------------------
 SUMMARY
 ----------------------------------------------------------------------------
@@ -204,9 +204,9 @@ RGKMO
 RGMDS
 /
 BWPR
-% for sensor in dic["sensorijk"]: 
+% for sensor in sensorijk: 
 ${sensor[0]+1} ${sensor[1]+1} ${sensor[2]+1} /
-% if dic["lower"]:
+% if lower:
 <% break %>
 % endif
 % endfor
@@ -215,12 +215,12 @@ ${sensor[0]+1} ${sensor[1]+1} ${sensor[2]+1} /
 SCHEDULE
 ----------------------------------------------------------------------------
 RPTRST
-BASIC=2 DEN PCGW RESIDUAL ${f"RSWSAT /" if dic['model'] != 'immiscible' else "/"}
-% if dic['model'] == 'convective':
+BASIC=2 DEN PCGW RESIDUAL ${f"RSWSAT /" if model != 'immiscible' else "/"}
+% if model == 'convective':
 
 DRSDTCON
-% if dic['drsdtcon']:
-% for row in dic['drsdtcon']:
+% if drsdtcon:
+% for row in drsdtcon:
 ${str([val for val in row])[1:-1]} /
 % endfor
 % else:
@@ -234,81 +234,81 @@ ${str([val for val in row])[1:-1]} /
 % endif
 /
 % endif
-% if dic['model'] in ["complete", "convective"]:
+% if model in ["complete", "convective"]:
 
 BCPROP
 1 THERMAL /
 2 THERMAL /
 /
 % endif
-% if sum(dic['radius']) > 0:
+% if sum(radius) > 0:
 
 WELSPECS
-% for i in range(len(dic['wellijk'])):
-% if dic['radius'][i] > 0:
-INJ${i} G1 ${dic['wellijk'][i][0]} ${dic['wellijk'][i][1]} 1* GAS ${dic['radius'][i]} /
+% for i in range(len(wellijk)):
+% if radius[i] > 0:
+INJ${i} G1 ${wellijk[i][0]} ${wellijk[i][1]} 1* GAS ${radius[i]} /
 % endif
-% if dic["lower"]:
+% if lower:
 <% break %>
 % endif
 % endfor
 /
 
 COMPDAT
-% for i in range(len(dic['wellijk'])):
-% if dic['radius'][i] > 0:
-INJ${i} ${dic['wellijk'][i][0]} ${dic['wellijk'][i][1]} ${dic['wellijk'][i][2]} ${dic['wellijk'][i][2]} OPEN 2* ${2.*dic['radius'][i]} /
+% for i in range(len(wellijk)):
+% if radius[i] > 0:
+INJ${i} ${wellijk[i][0]} ${wellijk[i][1]} ${wellijk[i][2]} ${wellijk[i][2]} OPEN 2* ${2.*radius[i]} /
 % endif
-% if dic["lower"]:
+% if lower:
 <% break %>
 % endif
 % endfor
 /
 % endif
-% for j in range(len(dic['inj'])):
+% for j in range(len(inj)):
 
-% if dic["tuning"]:
+% if tuning:
 TUNING
-${dic['inj'][j][8]+" " if len(dic['inj'][j])>8 else ""}/
-${dic['inj'][j][9]+" " if len(dic['inj'][j])>9 else ""}/
-${dic['inj'][j][10]+" " if len(dic['inj'][j])>10 else ""}/
+${inj[j][8]+" " if len(inj[j])>8 else ""}/
+${inj[j][9]+" " if len(inj[j])>9 else ""}/
+${inj[j][10]+" " if len(inj[j])>10 else ""}/
 % endif
-% if max(dic['radius']) > 0:
+% if max(radius) > 0:
 WCONINJE
-% for i in range(len(dic['wellijk'])):
-% if dic['radius'][i] > 0:
-INJ${i} ${'GAS' if dic['inj'][j][2+3*i] > 0 else 'WATER'} ${'OPEN' if dic['inj'][j][3+3*i] > 0 else 'SHUT'} RATE ${f"{dic['inj'][j][3+3*i] * 86400 / 1.86843:E}"} 1* 480 /
+% for i in range(len(wellijk)):
+% if radius[i] > 0:
+INJ${i} ${'GAS' if inj[j][2+3*i] > 0 else 'WATER'} ${'OPEN' if inj[j][3+3*i] > 0 else 'SHUT'} RATE ${f"{inj[j][3+3*i] * 86400 / 1.86843:E}"} 1* 480 /
 % endif
-% if dic["lower"]:
+% if lower:
 <% break %>
 % endif
 % endfor
 /
 % endif
-% if min(dic['radius']) == 0:
+% if min(radius) == 0:
 SOURCE
-% for i in range(len(dic['wellijk'])):
-% if dic['radius'][i] == 0:
-${dic['wellijk'][i][0]} ${dic['wellijk'][i][1]} ${dic['wellijk'][i][2]} ${'GAS' if dic['inj'][j][2+3*i] > 0 else 'WATER'} ${f"{dic['inj'][j][3+3*i] * 86400:E}"} ${f"1* {dic['inj'][j][4+3*i]:E} " if dic['model'] in ["complete", "convective"] else ""}/
+% for i in range(len(wellijk)):
+% if radius[i] == 0:
+${wellijk[i][0]} ${wellijk[i][1]} ${wellijk[i][2]} ${'GAS' if inj[j][2+3*i] > 0 else 'WATER'} ${f"{inj[j][3+3*i] * 86400:E}"} ${f"1* {inj[j][4+3*i]:E} " if model in ["complete", "convective"] else ""}/
 % endif
-% if dic["lower"]:
+% if lower:
 <% break %>
 % endif
 % endfor
 /
 % endif
-% if dic['model'] in ["complete", "convective"] and max(dic['radius']) > 0:
+% if model in ["complete", "convective"] and max(radius) > 0:
 WTEMP
-% for i in range(len(dic['wellijk'])):
-% if dic['radius'][i] > 0:
-INJ${i} ${dic['inj'][j][4+3*i]} /
+% for i in range(len(wellijk)):
+% if radius[i] > 0:
+INJ${i} ${inj[j][4+3*i]} /
 % endif
-% if dic["lower"]:
+% if lower:
 <% break %>
 % endif
 % endfor
 /
 % endif
 TSTEP
-${f"{round(dic['inj'][j][0]/dic['inj'][j][1])}*" if round(dic['inj'][j][0]/dic['inj'][j][1]) > 1 else ""}${dic['inj'][j][1] / 86400.} /
+${f"{round(inj[j][0]/inj[j][1])}*" if round(inj[j][0]/inj[j][1]) > 1 else ""}${inj[j][1] / 86400.} /
 % endfor

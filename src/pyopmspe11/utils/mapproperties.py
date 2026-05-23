@@ -4,12 +4,15 @@
 
 """Utility function for the grid and locations in the geological models."""
 
+import sys
 import csv
+from contextlib import nullcontext
 import numpy as np
 from shapely.geometry import Point, Polygon
 from shapely.prepared import prep
 from alive_progress import alive_bar
 from numpy.typing import NDArray
+
 
 from pyopmspe11.config.config import Config
 from pyopmspe11.utils.writefile import (
@@ -140,10 +143,16 @@ def structured_handling_spe11a(
     nxz = cfg.nxyz[0] * cfg.nxyz[2]
     fluxnum = np.zeros(nxz, dtype="uint8")
     fipnum = np.zeros(nxz, dtype="uint8")
-    with alive_bar(nxz, bar="fish") as bar_animation:
+    show_progress = sys.stdout.isatty()
+    if show_progress:
+        bar_ctx = alive_bar(nxz, bar="fish")
+    else:
+        bar_ctx = nullcontext()
+    with bar_ctx as bar_animation:
         for k in range(cfg.nxyz[2]):
             for i in range(cfg.nxyz[0]):
-                bar_animation()
+                if show_progress:
+                    bar_animation()
                 gind = i + k * cfg.nxyz[0]
                 n = 0
                 order = polygon_search_order(zcent[k], zmidbot, ztopbot)
@@ -191,13 +200,19 @@ def structured_handling_spe11bc(
     no_cells_z = cfg.nxyz[2]
     spe11 = cfg.spe11
     z_c = map_z(cfg, ycent) if spe11 == "spe11c" else 0 * ycent
-    with alive_bar(no_cells_x * no_cells_z, bar="fish") as bar_animation:
+    show_progress = sys.stdout.isatty()
+    if show_progress:
+        bar_ctx = alive_bar(no_cells_x * no_cells_z, bar="fish")
+    else:
+        bar_ctx = nullcontext()
+    with bar_ctx as bar_animation:
         for index_z in range(no_cells_z):
             value_z = zcent[index_z]
             order = polygon_search_order(value_z, zmidbot, ztopbot)
             for index_x in range(no_cells_x):
                 gind = index_x + index_z * no_cells_x * no_cells_y
-                bar_animation()
+                if show_progress:
+                    bar_animation()
                 value_x = xcent[index_x]
                 point = Point(value_x, value_z)
                 n = 0
@@ -383,9 +398,15 @@ def corner_point_handling_spe11a(
     nxz = cfg.nxyz[0] * cfg.nxyz[2]
     fluxnum = np.zeros(nxz, dtype="uint8")
     fipnum = np.zeros(nxz, dtype="uint8")
-    with alive_bar(nxz, bar="fish") as bar_animation:
+    show_progress = sys.stdout.isatty()
+    if show_progress:
+        bar_ctx = alive_bar(nxz, bar="fish")
+    else:
+        bar_ctx = nullcontext()
+    with bar_ctx as bar_animation:
         for i in range(nxz):
-            bar_animation()
+            if show_progress:
+                bar_animation()
             i_x = i % no_cells_x
             k_z = i // no_cells_x
             gind = i_x + k_z * no_cells_x
@@ -463,9 +484,15 @@ def corner_point_handling_spe11bc(
     xtemp = np.empty(no_cells_x, dtype=xc[0].dtype)
     ztemp = np.empty(no_cells_x, dtype=zc[0].dtype)
     z_c = map_z(cfg, ycent) if spe11 == "spe11c" else 0 * ycent
-    with alive_bar(nxz, bar="fish") as bar_animation:
+    show_progress = sys.stdout.isatty()
+    if show_progress:
+        bar_ctx = alive_bar(nxz, bar="fish")
+    else:
+        bar_ctx = nullcontext()
+    with bar_ctx as bar_animation:
         for i in range(nxz):
-            bar_animation()
+            if show_progress:
+                bar_animation()
             i_x = i % no_cells_x
             k_z = i // no_cells_x
             gind = i_x + k_z * no_cells_x * no_cells_y

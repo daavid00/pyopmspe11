@@ -2,9 +2,7 @@
 # SPDX-License-Identifier: MIT
 # pylint: disable=R0915
 
-"""
-Utility functions to set required input values for pyopmspe11.
-"""
+"""Utility functions to set required input values for pyopmspe11."""
 
 import csv
 import sys

@@ -2,13 +2,10 @@
 # SPDX-License-Identifier: MIT
 # pylint: disable=R0912, R0913, R0914, R0915, R0917
 
-"""
-Utility functions to write necessary files and variables
-"""
+"""Utility functions to write necessary files and variables"""
 
 import subprocess
 from pathlib import Path
-from dataclasses import asdict
 import numpy as np
 from numpy.typing import NDArray
 from mako.template import Template
@@ -21,8 +18,9 @@ HEADER = (
 )
 
 
-def z_c(cfg: Config, y) -> NDArray:
+def z_c(cfg: Config, y: NDArray) -> NDArray:
     """Get the corner z coordinate"""
+    assert cfg.elevation is not None
     dy = cfg.dims[1]
     a = (2.0 * y / dy) - 1.0
     return (
@@ -201,7 +199,35 @@ def compact_format_numeric(v: NDArray) -> list:
 def opm_files(cfg: Config) -> None:
     """Write opm-related files by running mako templates"""
     mytemplate = Template(filename=f"{cfg.pat}/templates/co2/{cfg.spe11}.mako")
-    filledtemplate = mytemplate.render(dic=asdict(cfg))
+    filledtemplate = mytemplate.render(
+        nxyz=cfg.nxyz,
+        model=cfg.model,
+        diffusion=cfg.diffusion,
+        dispersion=cfg.dispersion,
+        dims=cfg.dims,
+        cut=cfg.cut,
+        lower=cfg.lower,
+        grid=cfg.grid,
+        compact_dx=cfg.compact_dx,
+        radius=cfg.radius,
+        wellijk=cfg.wellijk,
+        wellijkf=cfg.wellijkf,
+        wellkh=cfg.wellkh,
+        rock=cfg.rock,
+        kzMult=cfg.kzMult,
+        rockCond=cfg.rockCond,
+        temperature=cfg.temperature,
+        rockExtra=cfg.rockExtra,
+        datum=cfg.datum,
+        pressure=cfg.pressure,
+        maxelevation=cfg.maxelevation,
+        spe11aBC=cfg.spe11aBC,
+        safu=cfg.safu,
+        sensorijk=cfg.sensorijk,
+        inj=cfg.inj,
+        tuning=cfg.tuning,
+        drsdtcon=cfg.drsdtcon,
+    )
     with open(
         f"{cfg.deckfol}/{cfg.fol.split('/')[-1].upper()}.DATA", "w", encoding="utf8"
     ) as file:
@@ -209,14 +235,19 @@ def opm_files(cfg: Config) -> None:
     mytemplate = Template(
         filename=f"{cfg.pat}/templates/common/saturation_functions.mako"
     )
-    filledtemplate = mytemplate.render(dic=asdict(cfg))
+    filledtemplate = mytemplate.render(
+        s_w=cfg.s_w,
+        krw_expr=cfg.krw,
+        krn_expr=cfg.krn,
+        pcap_expr=cfg.pcap,
+        safu=cfg.safu,
+        deckfol=cfg.deckfol,
+    )
     script = f"{cfg.deckfol}/saturation_functions.py"
     with open(script, "w", encoding="utf8") as file:
         file.write(filledtemplate)
     subprocess.run(["chmod", "u+x", script], check=True)
-    result = subprocess.run(["python3", script], check=True)
-    if result.returncode != 0:
-        raise ValueError(f"Invalid result: {result.returncode}")
+    subprocess.run(["python3", script], check=True)
     Path(script).unlink(missing_ok=True)
 
 
