@@ -2,7 +2,12 @@
 # SPDX-License-Identifier: MIT
 # pylint: disable=R0912, R0913, R0914, R0915, R0917
 
-"""Utility functions to write necessary files and variables"""
+"""Write OPM grid, property, deck, and saturation-function files.
+
+The module serializes COORD and ZCORN geometry, compact keyword arrays, boundary
+pore-volume edits, rendered DATA files, and generated saturation tables for the
+selected SPE11 configuration.
+"""
 
 import os
 import subprocess
@@ -21,8 +26,21 @@ HEADER = (
 )
 
 
-def z_c(cfg: Config, y: NDArray) -> NDArray:
-    """Get the corner z coordinate"""
+def _calculate_spe11c_z_offset(cfg: Config, y: NDArray) -> NDArray:
+    """Calculate SPE11C corner elevations along the y axis.
+
+    Parameters
+    ----------
+    cfg : Config
+        Initialized runtime configuration.
+    y : NDArray
+        Coordinates along the y axis.
+
+    Returns
+    -------
+    NDArray
+        Calculated numeric values.
+    """
     assert cfg.elevation is not None
     dy = cfg.dims[1]
     a = (2.0 * y / dy) - 1.0
@@ -31,15 +49,81 @@ def z_c(cfg: Config, y: NDArray) -> NDArray:
     )
 
 
-def round_like_e(v: NDArray) -> NDArray:
-    """Keep only 8 significant digits to reduce size of created files"""
+def _round_significant(v: NDArray) -> NDArray:
+    """Round numeric values to eight significant digits.
+
+    Parameters
+    ----------
+    v : NDArray
+        Numeric values to format.
+
+    Returns
+    -------
+    NDArray
+        Calculated numeric values.
+    """
     return np.asarray([float(f"{x:E}") for x in v])
 
 
-def create_corner_point_grid(
+def _build_surface_values(
+    off: int,
+    nx: int,
+    ny: int,
+    stride_z: int,
+    yc: NDArray,
+    zcoord: NDArray,
+) -> NDArray:
+    """Build one rounded ZCORN surface block.
+
+    Parameters
+    ----------
+    off : int
+        Vertical surface offset.
+    nx : int
+        Number of cells along x.
+    ny : int
+        Number of cells along y.
+    stride_z : int
+        Number of pillar points along z.
+    yc : NDArray
+        SPE11C vertical offsets at y vertices.
+    zcoord : NDArray
+        Corner-point pillar z coordinates.
+
+    Returns
+    -------
+    NDArray
+        Calculated numeric values.
+    """
+    zleft = zcoord[off::stride_z][:nx]
+    zright = zcoord[off + stride_z :: stride_z][:nx]
+    out = [np.empty(0)] * (2 * ny)
+    j = 0
+    for y in range(ny):
+        zb = yc[y]
+        zt = yc[y + 1]
+        out[j] = np.column_stack((zb + zleft, zb + zright)).ravel()
+        out[j + 1] = np.column_stack((zt + zleft, zt + zright)).ravel()
+        j += 2
+    return _round_significant(np.concatenate(out))
+
+
+def write_corner_point_grid(
     cfg: Config, xcoord: NDArray, ycoord: NDArray, zcoord: NDArray
 ) -> None:
-    """Construct COORD and ZCORN"""
+    """Write COORD and ZCORN for a corner-point grid.
+
+    Parameters
+    ----------
+    cfg : Config
+        Initialized runtime configuration.
+    xcoord : NDArray
+        Corner-point pillar x coordinates.
+    ycoord : NDArray
+        Grid vertices along y.
+    zcoord : NDArray
+        Corner-point pillar z coordinates.
+    """
     grid = []
     top_z = cfg.dims[2]
     nx, ny, nz = cfg.nxyz
@@ -59,30 +143,19 @@ def create_corner_point_grid(
             np.zeros(xx_top.size),
         )
     ).ravel()
-    grid += compact_format_numeric(round_like_e(vals))
+    grid += _format_compact_keyword_values(_round_significant(vals))
     grid.append("/\n")
     grid.append("ZCORN\n")
     if cfg.spe11 == "spe11c":
-        yc = z_c(cfg, ycoord)
-
-        def stream_surface(off: int) -> NDArray:
-            zleft = zcoord[off::stride_z][:nx]
-            zright = zcoord[off + stride_z :: stride_z][:nx]
-            out = [np.empty(0)] * (2 * ny)
-            j = 0
-            for y in range(ny):
-                zb = yc[y]
-                zt = yc[y + 1]
-                out[j] = np.column_stack((zb + zleft, zb + zright)).ravel()
-                out[j + 1] = np.column_stack((zt + zleft, zt + zright)).ravel()
-                j += 2
-            return round_like_e(np.concatenate(out))
-
-        grid += compact_format_numeric(stream_surface(0))
+        yc = _calculate_spe11c_z_offset(cfg, ycoord)
+        grid += _format_compact_keyword_values(
+            _build_surface_values(0, nx, ny, stride_z, yc, zcoord)
+        )
         for k in range(nz - 1):
-            blk = stream_surface(k + 1)
-            grid += compact_format_numeric(blk)
-            grid += compact_format_numeric(blk)
+            blk = _build_surface_values(k + 1, nx, ny, stride_z, yc, zcoord)
+
+            grid += _format_compact_keyword_values(blk)
+            grid += _format_compact_keyword_values(blk)
         out = [np.empty(0)] * (2 * ny)
         j = 0
         for y in range(ny):
@@ -91,26 +164,26 @@ def create_corner_point_grid(
             out[j] = np.repeat([zlow, zlow], nx)
             out[j + 1] = np.repeat([zhigh, zhigh], nx)
             j += 2
-        grid += compact_format_numeric(round_like_e(np.concatenate(out)))
+        grid += _format_compact_keyword_values(_round_significant(np.concatenate(out)))
     else:
         top = np.column_stack(
             (zcoord[0::stride_z][:nx], zcoord[stride_z::stride_z][:nx])
         ).ravel()
-        top = round_like_e(top)
-        grid += compact_format_numeric(np.concatenate((top, top)))
+        top = _round_significant(top)
+        grid += _format_compact_keyword_values(np.concatenate((top, top)))
         for k in range(1, nz):
             zk = np.column_stack(
                 (zcoord[k::stride_z][:nx], zcoord[k + stride_z :: stride_z][:nx])
             ).ravel()
-            zk = round_like_e(zk)
+            zk = _round_significant(zk)
             if k == nz - 1:
-                grid += compact_format_numeric(np.tile(zk, 3))
+                grid += _format_compact_keyword_values(np.tile(zk, 3))
             else:
-                grid += compact_format_numeric(np.tile(zk, 4))
+                grid += _format_compact_keyword_values(np.tile(zk, 4))
         final_left = zcoord[(np.arange(nx) + 1) * stride_z - 1]
         final_right = zcoord[(np.arange(nx) + 2) * stride_z - 1]
-        final = round_like_e(np.column_stack((final_left, final_right)).ravel())
-        grid += compact_format_numeric(np.concatenate((zk, final, final)))
+        final = _round_significant(np.column_stack((final_left, final_right)).ravel())
+        grid += _format_compact_keyword_values(np.concatenate((zk, final, final)))
     with open(f"{cfg.deckfol}/GRID.INC", "w", encoding="utf8") as f:
         f.write(HEADER)
         f.write("".join(grid))
@@ -124,15 +197,39 @@ def write_keywords(
     xmx: NDArray,
     zmz: NDArray | None = None,
     porv: list | None = None,
-) -> None:
-    """Write used keywords for OPM Flow"""
+) -> list[str]:
+    """Write grid property include files required by the selected case.
+
+    Parameters
+    ----------
+    cfg : Config
+        Initialized runtime configuration.
+    fipnum : NDArray
+        FIPNUM values in global cell order.
+    fluxnum : NDArray
+        Facies identifiers in global cell order.
+    xmx : NDArray
+        Grid vertices along the x axis.
+    zmz : NDArray | None, optional
+        Grid vertices along the z axis.
+    porv : list | None, optional
+        Boundary pore-volume edit records.
+
+    Returns
+    -------
+    list[str]
+        Names of the generated property include files.
+    """
+    names = []
     if cfg.spe11 == "spe11a":
         if cfg.grid == "tensor":
             assert zmz is not None
             dx = np.tile(xmx[1:] - xmx[:-1], cfg.nxyz[2])
             dz = np.repeat((zmz[1:] - zmz[:-1])[: cfg.nxyz[2]], cfg.nxyz[0])
-            write_keyword(cfg, "DX", dx)
-            write_keyword(cfg, "DZ", dz)
+            _write_keyword(cfg, "DX", dx)
+            _write_keyword(cfg, "DZ", dz)
+            names.append("DX.INC")
+            names.append("DZ.INC")
     elif cfg.spe11 == "spe11b":
         assert porv is not None
         delta_x = xmx[1:] - xmx[:-1]
@@ -140,24 +237,39 @@ def write_keywords(
             assert zmz is not None
             dx = np.tile(delta_x, cfg.nxyz[2])
             dz = np.repeat((zmz[1:] - zmz[:-1])[: cfg.nxyz[2]], cfg.nxyz[0])
-            write_keyword(cfg, "DX", dx)
-            write_keyword(cfg, "DZ", dz)
+            _write_keyword(cfg, "DX", dx)
+            _write_keyword(cfg, "DZ", dz)
+            names.append("DX.INC")
+            names.append("DZ.INC")
         elif np.min(delta_x) != np.max(delta_x) and cfg.grid == "cartesian":
             cfg.compact_dx = True
             dx = np.concatenate(
                 [delta_x, np.tile(delta_x[-cfg.nxyz[0] :], cfg.nxyz[2] - 1)]
             )
-            write_keyword(cfg, "DX", dx)
-        write_keyword_pv(cfg, porv)
+            _write_keyword(cfg, "DX", dx)
+            names.append("DX.INC")
+        _write_boundary_pore_volume(cfg, porv)
+        names.append("PVBOUNDARIES.INC")
     else:
         assert porv is not None
-        write_keyword_pv(cfg, porv)
-    write_keyword(cfg, "FIPNUM", fipnum)
-    write_keyword(cfg, "FLUXNUM", fluxnum)
+        _write_boundary_pore_volume(cfg, porv)
+    _write_keyword(cfg, "FIPNUM", fipnum)
+    _write_keyword(cfg, "FLUXNUM", fluxnum)
+    names.append("FIPNUM.INC")
+    names.append("FLUXNUM.INC")
+    return names
 
 
-def write_keyword_pv(cfg: Config, porv: list) -> None:
-    """Write the added pore volume on the boundaries"""
+def _write_boundary_pore_volume(cfg: Config, porv: list) -> None:
+    """Write boundary pore-volume modifications to an include file.
+
+    Parameters
+    ----------
+    cfg : Config
+        Initialized runtime configuration.
+    porv : list
+        Boundary pore-volume edit records.
+    """
     with open(f"{cfg.deckfol}/PVBOUNDARIES.INC", "w", encoding="utf8") as f:
         f.write(HEADER)
         f.write("EQUALS\n")
@@ -165,17 +277,38 @@ def write_keyword_pv(cfg: Config, porv: list) -> None:
         f.write("\n/\n")
 
 
-def write_keyword(cfg: Config, name: str, values: NDArray) -> None:
-    """Write the given keyword"""
+def _write_keyword(cfg: Config, name: str, values: NDArray) -> None:
+    """Write one numeric OPM keyword to an include file.
+
+    Parameters
+    ----------
+    cfg : Config
+        Initialized runtime configuration.
+    name : str
+        OPM keyword name.
+    values : NDArray
+        Numeric keyword values.
+    """
     with open(f"{cfg.deckfol}/{name}.INC", "w", encoding="utf8") as f:
         f.write(HEADER)
         f.write(f"{name}\n")
-        f.write("".join(compact_format_numeric(values)))
+        f.write("".join(_format_compact_keyword_values(values)))
         f.write("/\n")
 
 
-def compact_format_numeric(v: NDArray) -> list:
-    """Use the '*' notation to reduce size of created files"""
+def _format_compact_keyword_values(v: NDArray) -> list:
+    """Format numeric values using OPM repeat notation.
+
+    Parameters
+    ----------
+    v : NDArray
+        Numeric values to format.
+
+    Returns
+    -------
+    list[str]
+        Values formatted with OPM repeat notation and trailing separators.
+    """
     change = np.concatenate(([True], v[1:] != v[:-1]))
     idx = np.flatnonzero(change)
     counts = np.diff(np.append(idx, v.size))
@@ -199,8 +332,25 @@ def compact_format_numeric(v: NDArray) -> list:
     return out
 
 
-def opm_files(cfg: Config) -> None:
-    """Write opm-related files by running mako templates"""
+def write_opm_input_files(cfg: Config) -> list[str]:
+    """Render the main DATA file and saturation-function tables.
+
+    Parameters
+    ----------
+    cfg : Config
+        Initialized runtime configuration.
+
+    Returns
+    -------
+    list[str]
+        Names of the generated DATA file and saturation-table include file.
+
+    Raises
+    ------
+    subprocess.CalledProcessError
+        If an invoked process exits with a nonzero status.
+    """
+    names = []
     deckfol = Path(cfg.deckfol)
     mytemplate = Template(filename=f"{cfg.pat}/templates/co2/{cfg.spe11}.mako")
     filledtemplate = mytemplate.render(
@@ -234,6 +384,7 @@ def opm_files(cfg: Config) -> None:
     )
     filename = Path(cfg.fol).name.upper() + ".DATA"
     filepath = deckfol / filename
+    names.append(filename)
     with open(filepath, "w", encoding="utf8") as file:
         file.write(filledtemplate)
     mytemplate = Template(
@@ -255,17 +406,31 @@ def opm_files(cfg: Config) -> None:
         subprocess.run(["chmod", "u+x", str(script)], check=True)
     subprocess.run([sys.executable, str(script)], check=True)
     script.unlink(missing_ok=True)
+    names.append("TABLES.INC")
+    return names
 
 
 def write_regular_spe11c_grid(
     cfg: Config, xmx: NDArray, ymy: NDArray, zmz: NDArray
 ) -> None:
-    """Write structured SPE11C grid"""
+    """Write COORD and ZCORN for a structured SPE11C grid.
+
+    Parameters
+    ----------
+    cfg : Config
+        Initialized runtime configuration.
+    xmx : NDArray
+        Grid vertices along the x axis.
+    ymy : NDArray
+        Grid vertices along the y axis.
+    zmz : NDArray
+        Grid vertices along the z axis.
+    """
     grid = []
     grid.append("COORD\n")
     xx, yy = np.meshgrid(xmx, ymy, indexing="xy")
-    grid += compact_format_numeric(
-        round_like_e(
+    grid += _format_compact_keyword_values(
+        _round_significant(
             np.column_stack(
                 (
                     xx.ravel(),
@@ -281,14 +446,14 @@ def write_regular_spe11c_grid(
     grid.append("/\n")
     grid.append("ZCORN\n")
     nx, ny, nz = cfg.nxyz
-    z_base = z_c(cfg, ymy)
+    z_base = _calculate_spe11c_z_offset(cfg, ymy)
     out = []
     for y in range(ny):
         zb = z_base[y]
         zt = z_base[y + 1]
         out.append(np.repeat([zb, zb], nx))
         out.append(np.repeat([zt, zt], nx))
-    grid += compact_format_numeric(round_like_e(np.concatenate(out)))
+    grid += _format_compact_keyword_values(_round_significant(np.concatenate(out)))
     for k in range(nz - 1):
         shift = zmz[k + 1]
         out = []
@@ -297,8 +462,8 @@ def write_regular_spe11c_grid(
             zt = z_base[y + 1] + shift
             out.append(np.repeat([zb, zb], nx))
             out.append(np.repeat([zt, zt], nx))
-        blk = round_like_e(np.concatenate(out))
-        grid += compact_format_numeric(np.tile(blk, 2))
+        blk = _round_significant(np.concatenate(out))
+        grid += _format_compact_keyword_values(np.tile(blk, 2))
     final_shift = cfg.dims[2]
     out = []
     for y in range(ny):
@@ -306,7 +471,7 @@ def write_regular_spe11c_grid(
         zt = z_base[y + 1] + final_shift
         out.append(np.repeat([zb, zb], nx))
         out.append(np.repeat([zt, zt], nx))
-    grid += compact_format_numeric(round_like_e(np.concatenate(out)))
+    grid += _format_compact_keyword_values(_round_significant(np.concatenate(out)))
     with open(f"{cfg.deckfol}/GRID.INC", "w", encoding="utf8") as f:
         f.write(HEADER)
         f.write("".join(grid))

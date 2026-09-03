@@ -1,379 +1,717 @@
 
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Configuration file &mdash; pyopmspe11  documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Configuration reference &#8212; pyopmspe11 documentation</title>
   
-      <script src="_static/jquery.js?v=5d32c60e"></script>
-      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="_static/js/theme.js"></script>
-    <link rel="author" title="About these documents" href="about.html" />
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=d109aa7d" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
+
+    <script src="_static/documentation_options.js?v=1485e655"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=eef4a3d2"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'configuration_file';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Examples" href="examples.html" />
-    <link rel="prev" title="Installation" href="installation.html" /> 
-</head>
+    <link rel="next" title="Model selection" href="configuration/model.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2026.10rc0" />
+    <meta name="docbuild:last-update" content="2026-09-03"/>
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search"  style="background: #aaaaaa" >
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
 
-          
-          
-          <a href="index.html">
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/pyopmspe11.svg" class="logo__image only-light" alt="pyopmspe11 documentation - Home"/>
+    <img src="_static/pyopmspe11.svg" class="logo__image only-dark pst-js-only" alt="pyopmspe11 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="introduction.html">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Configuration reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="examples.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="benchmark.html">
+    Benchmark
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="command-line.html">
+    Command-line reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="convergence.html">
+    Convergence
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="api.html">
+    Python API
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="output_folder.html">
+    Output folder
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="related.html">
+    Related projects
+  </a>
+</li>
+
+                </ul>
+            </li>
             
-              <img src="_static/logo.png" class="logo" alt="Logo"/>
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration file</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#txt">txt</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#reservoir-related-parameters">Reservoir-related parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#soil-related-parameters">Soil-related parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#well-related-parameters">Well-related parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#toml">toml</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#additional-definitions">Additional definitions</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="benchmark.html">Benchmark</a></li>
-<li class="toctree-l1"><a class="reference internal" href="convergence.html">Convergence</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">pyopmspe11 Python API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="output_folder.html">Output folder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="related.html">Related</a></li>
-<li class="toctree-l1"><a class="reference internal" href="about.html">About pyopmspe11</a></li>
-</ul>
-
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #aaaaaa" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">pyopmspe11</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Configuration file</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="_sources/configuration_file.rst.txt" rel="nofollow"> View page source</a>
-      </li>
   </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
-  <section id="configuration-file">
-<h1>Configuration file<a class="headerlink" href="#configuration-file" title="Link to this heading"></a></h1>
-<p>In the initial development of <strong>pyopmspe11</strong>, the adopted configuration file format was the
-one described below, i.e., via <a class="reference internal" href="#txt"><span class="std std-ref">txt</span></a> files. The current development of <strong>pyopmspe11</strong> considers
-<a class="reference internal" href="#toml"><span class="std std-ref">toml</span></a> files. To keep compatibility with previous configuration files,
-then support for <a class="reference internal" href="#txt"><span class="std std-ref">txt</span></a> files will be kept, while new features will by added using <a class="reference internal" href="#toml"><span class="std std-ref">toml</span></a> configuration
-files.</p>
-<section id="txt">
-<span id="id1"></span><h2>txt<a class="headerlink" href="#txt" title="Link to this heading"></a></h2>
-<p>The first input parameter in the configuration file is:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="sd">&quot;&quot;&quot;Set the full path to the flow executable and flags&quot;&quot;&quot;</span>
-<span class="linenos">2</span><span class="n">flow</span> <span class="o">--</span><span class="n">relaxed</span><span class="o">-</span><span class="nb">max</span><span class="o">-</span><span class="n">pv</span><span class="o">-</span><span class="n">fraction</span><span class="o">=</span><span class="mi">0</span> <span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">tuning</span><span class="o">=</span><span class="n">true</span> <span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">opm</span><span class="o">-</span><span class="n">rst</span><span class="o">-</span><span class="n">file</span><span class="o">=</span><span class="n">true</span> <span class="o">--</span><span class="n">output</span><span class="o">-</span><span class="n">extra</span><span class="o">-</span><span class="n">convergence</span><span class="o">-</span><span class="n">info</span><span class="o">=</span><span class="n">steps</span><span class="p">,</span><span class="n">iterations</span>
-</pre></div>
-</div>
-<p>If <strong>flow</strong> is not in your path, then write the full path to the executable
-(e.g., /Users/dmar/opm/build/opm-simulators/bin/flow). We also add in the same
-line as many flags as required (see the OPM Flow documentation <a class="reference external" href="https://opm-project.org/?page_id=955">here</a>).</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If you have installed flow with MPI support, then you can run the simulations in
-parallel by adding <strong>mpirun -np N flow …</strong> where N is the number of cpus.</p>
-</div>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>By executing flow -h you get an overview of the available flags in the
-flow simulator to improve/fix convergence and mass issues (i.e., by setting the flag --linear-solver=cpr_trueimpes to change the linear solver,
-by tightening the cnv tolerances (--tolerance-cnv), etc.).</p>
-</div>
-<section id="reservoir-related-parameters">
-<h3>Reservoir-related parameters<a class="headerlink" href="#reservoir-related-parameters" title="Link to this heading"></a></h3>
-<p>The following input lines in the configuration file are:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 4</span><span class="sd">&quot;&quot;&quot;Set the model parameters&quot;&quot;&quot;</span>
-<span class="linenos"> 5</span><span class="n">spe11c</span> <span class="n">master</span>     <span class="c1">#Name of the spe case (spe11a, spe11b, or spe11c) and OPM Flow version (master or release)</span>
-<span class="linenos"> 6</span><span class="n">complete</span>          <span class="c1">#Name of the co2 model (immiscible, isothermal, convective, or complete)</span>
-<span class="linenos"> 7</span><span class="n">corner</span><span class="o">-</span><span class="n">point</span>      <span class="c1">#Type of grid (cartesian, tensor, or corner-point)</span>
-<span class="linenos"> 8</span><span class="mi">8400</span> <span class="mi">5000</span> <span class="mi">1200</span>    <span class="c1">#Length, width, and depth [m]</span>
-<span class="linenos"> 9</span><span class="mi">420</span>               <span class="c1">#If cartesian, number of x cells [-]; otherwise, variable array of x-refinement</span>
-<span class="linenos">10</span><span class="mi">30</span><span class="p">,</span><span class="mi">40</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="mi">40</span><span class="p">,</span><span class="mi">30</span>    <span class="c1">#If cartesian, number of y cells [-]; otherwise, variable array of y-refinement [-] (for spe11c)</span>
-<span class="linenos">11</span><span class="mi">5</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">9</span> <span class="c1">#If cartesian, number of z cells [-]; if tensor, variable array of z-refinement; if corner-point, fix array of z-refinement (11 or 18 entries)</span>
-<span class="linenos">12</span><span class="mi">70</span> <span class="mf">36.12</span>          <span class="c1">#Temperature bottom and top rig [C]</span>
-<span class="linenos">13</span><span class="mi">300</span> <span class="mf">3e7</span> <span class="mf">0.1</span>       <span class="c1">#Datum [m], pressure at the datum [Pa], and multiplier for the permeability in the z direction [-]</span>
-<span class="linenos">14</span><span class="mf">1e-9</span> <span class="mf">2e-8</span>         <span class="c1">#Diffusion (in liquid and gas) [m^2/s]</span>
-<span class="linenos">15</span><span class="mf">8.5e-1</span> <span class="mi">2500</span>       <span class="c1">#Rock specific heat and density (for spe11b/c)</span>
-<span class="linenos">16</span><span class="mi">0</span> <span class="mf">5e4</span> <span class="mi">1</span>           <span class="c1">#Added pore volume on top boundary (for spe11a [if 0, free flow bc]), pore volume on lateral boundaries, and width of buffer cell [m] (for spe11b/c)</span>
-<span class="linenos">17</span><span class="mi">150</span> <span class="mi">10</span>            <span class="c1">#Maximum elevation difference (relative to the baseline gradient) of the arch in the y direction [m] and back boundary elevation [m] (for spe11c)</span>
-</pre></div>
-</div>
-<p>In line 5 you specify if you are using OPM Flow from the master branch or from the latest stable release (OPM-flow 2026.04 release).
-This since there are continuous changes in the OPM master branch. Then we
-will keep updating the decks for using Flow from master and also we will keep the framework to produce decks compatible for the latest OPM stable release.
-The immiscible model allows for faster prototyping while the complete model includes dissolution of the components in the
-gas and liquid phases, in addition to thermal effects (the isothermal model neglects the thermal effects). Details on the convective model can be found in <a class="reference external" href="https://link.springer.com/article/10.1007/s11242-024-02141-5">Mykkeltvedt et al. (2025)</a>.
-Regarding the grid type, the cartesian mode generates an uniform grid
-with the defined number of elements in lines 9 to 11. The tensor grid allows to define arrays in each direction where the grid
-is first divided with the number of entries in the array, and after it divides each of these elements by the assigned number in
-the array entry. The corner-point mode generates a grid where the x and y direction are defined as in the array mode, but the
-cell faces in the z-direction follows the lines as defined in either the <a class="reference external" href="https://github.com/OPM/pyopmspe11/blob/main/src/pyopmspe11/reference_mesh/horizonts_11.geo">horizonts_11.geo</a> or <a class="reference external" href="https://github.com/OPM/pyopmspe11/blob/main/src/pyopmspe11/reference_mesh/horizonts_18.geo">horizonts_18.geo</a> script,
-resulting in 11 or 18 levels respectively. Then, the z-refinement in each of these levels is set. See the configuration files in the <a class="reference external" href="https://github.com/OPM/pyopmspe11/blob/main/tests">tests</a> and
-<a class="reference external" href="https://github.com/OPM/pyopmspe11/blob/main/benchmark">benchmark</a> folder for the setting of these grids.</p>
-<figure class="align-default">
-<img alt="_images/satnum.png" src="_images/satnum.png" />
-</figure>
-<figure class="align-default" id="id3">
-<img alt="_images/fipnum.png" src="_images/fipnum.png" />
-<figcaption>
-<p><span class="caption-text">Corner-point grid generated by the configuration file (INJ0 the horizontal well and INJ1 the curve well).
-The top figure shows the 7 different facies, while the bottom figure shows the fipnum numbers used to identify
-the boxes (A, B, and C), sensors, and the required regions to report the benchmark data.</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
-</figcaption>
-</figure>
-</section>
-<section id="soil-related-parameters">
-<h3>Soil-related parameters<a class="headerlink" href="#soil-related-parameters" title="Link to this heading"></a></h3>
-<p>The following entries define the properties of the different facies:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">19</span><span class="sd">&quot;&quot;&quot;Set the saturation functions&quot;&quot;&quot;</span>
-<span class="linenos">20</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">s_w</span> <span class="o">-</span> <span class="n">swi</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">swi</span><span class="p">)))</span> <span class="o">**</span> <span class="mf">1.5</span>                                                        <span class="c1">#Wetting rel perm saturation function [-]</span>
-<span class="linenos">21</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">s_w</span> <span class="o">-</span> <span class="n">sni</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">sni</span><span class="p">)))</span> <span class="o">**</span> <span class="mf">1.5</span>                                                    <span class="c1">#Non-wetting rel perm saturation function [-]</span>
-<span class="linenos">22</span><span class="n">penmax</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">erf</span><span class="p">(</span><span class="n">pen</span> <span class="o">*</span> <span class="p">((</span><span class="n">s_w</span><span class="o">-</span><span class="n">swi</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">swi</span><span class="p">))</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">1.5</span><span class="p">))</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">/</span> <span class="p">(</span><span class="n">penmax</span> <span class="o">*</span> <span class="mi">2</span><span class="p">))</span> <span class="c1">#Capillary pressure saturation function [Pa]</span>
-<span class="linenos">23</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="n">npoints</span><span class="p">)))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>                         <span class="c1">#Points to evaluate the saturation functions (s_w) [-]</span>
-<span class="linenos">24</span>
-<span class="linenos">25</span><span class="sd">&quot;&quot;&quot;Properties sat functions&quot;&quot;&quot;</span>
-<span class="linenos">26</span><span class="sd">&quot;&quot;&quot;swi [-], sni [-], pen [Pa], penmax [Pa], npoints [-]&quot;&quot;&quot;</span>
-<span class="linenos">27</span><span class="n">SWI1</span> <span class="mf">0.32</span> <span class="n">SNI1</span> <span class="mf">0.1</span> <span class="n">PEN1</span> <span class="mf">193531.39</span> <span class="n">PENMAX1</span> <span class="mf">3e7</span> <span class="n">NPOINTS1</span> <span class="mi">1000</span>
-<span class="linenos">28</span><span class="n">SWI2</span> <span class="mf">0.14</span> <span class="n">SNI2</span> <span class="mf">0.1</span> <span class="n">PEN2</span>   <span class="mf">8654.99</span> <span class="n">PENMAX2</span> <span class="mf">3e7</span> <span class="n">NPOINTS2</span> <span class="mi">1000</span>
-<span class="linenos">29</span><span class="n">SWI3</span> <span class="mf">0.12</span> <span class="n">SNI3</span> <span class="mf">0.1</span> <span class="n">PEN3</span>   <span class="mf">6120.00</span> <span class="n">PENMAX3</span> <span class="mf">3e7</span> <span class="n">NPOINTS3</span> <span class="mi">1000</span>
-<span class="linenos">30</span><span class="n">SWI4</span> <span class="mf">0.12</span> <span class="n">SNI4</span> <span class="mf">0.1</span> <span class="n">PEN4</span>   <span class="mf">3870.63</span> <span class="n">PENMAX4</span> <span class="mf">3e7</span> <span class="n">NPOINTS4</span> <span class="mi">1000</span>
-<span class="linenos">31</span><span class="n">SWI5</span> <span class="mf">0.12</span> <span class="n">SNI5</span> <span class="mf">0.1</span> <span class="n">PEN5</span>   <span class="mf">3060.00</span> <span class="n">PENMAX5</span> <span class="mf">3e7</span> <span class="n">NPOINTS5</span> <span class="mi">1000</span>
-<span class="linenos">32</span><span class="n">SWI6</span> <span class="mf">0.10</span> <span class="n">SNI6</span> <span class="mf">0.1</span> <span class="n">PEN6</span>   <span class="mf">2560.18</span> <span class="n">PENMAX6</span> <span class="mf">3e7</span> <span class="n">NPOINTS6</span> <span class="mi">1000</span>
-<span class="linenos">33</span><span class="n">SWI7</span>    <span class="mi">0</span> <span class="n">SNI7</span>   <span class="mi">0</span> <span class="n">PEN7</span>         <span class="mi">0</span> <span class="n">PENMAX7</span> <span class="mf">3e7</span> <span class="n">NPOINTS7</span>    <span class="mi">2</span>
-<span class="linenos">34</span>
-<span class="linenos">35</span><span class="sd">&quot;&quot;&quot;Properties rock&quot;&quot;&quot;</span>
-<span class="linenos">36</span><span class="sd">&quot;&quot;&quot;K [mD], phi [-], disp [m], thconr [W m-1 K-1]&quot;&quot;&quot;</span>
-<span class="linenos">37</span><span class="n">PERM1</span> <span class="mf">0.10132</span> <span class="n">PORO1</span> <span class="mf">0.10</span> <span class="n">DISP1</span> <span class="mi">10</span> <span class="n">THCONR1</span> <span class="mf">1.90</span>
-<span class="linenos">38</span><span class="n">PERM2</span> <span class="mf">101.324</span> <span class="n">PORO2</span> <span class="mf">0.20</span> <span class="n">DISP2</span> <span class="mi">10</span> <span class="n">THCONR2</span> <span class="mf">1.25</span>
-<span class="linenos">39</span><span class="n">PERM3</span> <span class="mf">202.650</span> <span class="n">PORO3</span> <span class="mf">0.20</span> <span class="n">DISP3</span> <span class="mi">10</span> <span class="n">THCONR3</span> <span class="mf">1.25</span>
-<span class="linenos">40</span><span class="n">PERM4</span> <span class="mf">506.625</span> <span class="n">PORO4</span> <span class="mf">0.20</span> <span class="n">DISP4</span> <span class="mi">10</span> <span class="n">THCONR4</span> <span class="mf">1.25</span>
-<span class="linenos">41</span><span class="n">PERM5</span> <span class="mf">1013.25</span> <span class="n">PORO5</span> <span class="mf">0.25</span> <span class="n">DISP5</span> <span class="mi">10</span> <span class="n">THCONR5</span> <span class="mf">0.92</span>
-<span class="linenos">42</span><span class="n">PERM6</span> <span class="mf">2026.50</span> <span class="n">PORO6</span> <span class="mf">0.35</span> <span class="n">DISP6</span> <span class="mi">10</span> <span class="n">THCONR6</span> <span class="mf">0.26</span>
-<span class="linenos">43</span><span class="n">PERM7</span>    <span class="mf">1e-5</span> <span class="n">PORO7</span> <span class="mf">1e-6</span> <span class="n">DISP7</span>  <span class="mi">0</span> <span class="n">THCONR7</span> <span class="mf">2.00</span>
-</pre></div>
-</div>
-<figure class="align-default">
-<img alt="_images/kr.png" src="_images/kr.png" />
-</figure>
-<figure class="align-default" id="id4">
-<img alt="_images/cap.png" src="_images/cap.png" />
-<figcaption>
-<p><span class="caption-text">Visualization in ResInsight of the relative permeability and capillary pressure functions in the facie 1.</span><a class="headerlink" href="#id4" title="Link to this image"></a></p>
-</figcaption>
-</figure>
-</section>
-<section id="well-related-parameters">
-<h3>Well-related parameters<a class="headerlink" href="#well-related-parameters" title="Link to this heading"></a></h3>
-<p>The last part of the configuration file sets the wells radius, location, and the injection schedule.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">45</span><span class="sd">&quot;&quot;&quot;Wells radius and position&quot;&quot;&quot;</span>
-<span class="linenos">46</span><span class="sd">&quot;&quot;&quot;radius (0 to use the SOURCE keyword instead of well keywords), x, y, and z position [m] (final positions as well for spe11c)&quot;&quot;&quot;</span>
-<span class="linenos">47</span><span class="mf">0.15</span> <span class="mf">2700.</span> <span class="mf">1000.</span> <span class="mf">300.</span> <span class="mf">2700.</span> <span class="mf">4000.</span> <span class="mf">300.</span> <span class="c1">#Well 1</span>
-<span class="linenos">48</span><span class="mf">0.15</span> <span class="mf">5100.</span> <span class="mf">1000.</span> <span class="mf">700.</span> <span class="mf">5100.</span> <span class="mf">4000.</span> <span class="mf">700.</span> <span class="c1">#Well 2</span>
-<span class="linenos">49</span>
-<span class="linenos">50</span><span class="sd">&quot;&quot;&quot;Define the injection values ([hours] for spe11a; [years] for spe11b/c)&quot;&quot;&quot;</span>
-<span class="linenos">51</span><span class="sd">&quot;&quot;&quot;1) injection time, 2) time step size to write results, 3) injected fluid (0 water, 1 co2) (well1), 4) injection rate [kg/s] (well1), 5) temperature [C] (well1), 6) injected fluid (0 water, 1 co2) (well2), 7) injection rate [kg/s] (well2), and 8) temperature [C] (well2). If --enable-tuning=1, then the TUNING values [days] as described in the OPM manual&quot;&quot;&quot;</span>
-<span class="linenos">52</span><span class="mf">999.9</span> <span class="mf">999.9</span> <span class="mi">1</span>  <span class="mi">0</span> <span class="mi">10</span> <span class="mi">1</span>  <span class="mi">0</span> <span class="mi">10</span>
-<span class="linenos">53</span>  <span class="mf">0.1</span>   <span class="mf">0.1</span> <span class="mi">1</span>  <span class="mi">0</span> <span class="mi">10</span> <span class="mi">1</span>  <span class="mi">0</span> <span class="mi">10</span>
-<span class="linenos">54</span>   <span class="mi">25</span>     <span class="mi">5</span> <span class="mi">1</span> <span class="mi">50</span> <span class="mi">10</span> <span class="mi">1</span>  <span class="mi">0</span> <span class="mi">10</span>
-<span class="linenos">55</span>   <span class="mi">25</span>     <span class="mi">5</span> <span class="mi">1</span> <span class="mi">50</span> <span class="mi">10</span> <span class="mi">1</span> <span class="mi">50</span> <span class="mi">10</span>
-<span class="linenos">56</span>   <span class="mi">50</span>    <span class="mi">25</span> <span class="mi">1</span>  <span class="mi">0</span> <span class="mi">10</span> <span class="mi">1</span>  <span class="mi">0</span> <span class="mi">10</span>
-<span class="linenos">57</span>  <span class="mi">400</span>    <span class="mi">50</span> <span class="mi">1</span>  <span class="mi">0</span> <span class="mi">10</span> <span class="mi">1</span>  <span class="mi">0</span> <span class="mi">10</span>
-<span class="linenos">58</span>  <span class="mi">500</span>   <span class="mi">100</span> <span class="mi">1</span>  <span class="mi">0</span> <span class="mi">10</span> <span class="mi">1</span>  <span class="mi">0</span> <span class="mi">10</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If tuning is enabled by the OPM flag <strong>–enable-tuning</strong>, then the TUNING keywords are added to the deck, see the OPM Flow manual for the definitions of all
-34 different options and their default values. To set this values, then one can add per injection line in the configuration file a string with the corresponding values, e.g., to set a
-maximum time step of 10 days at the beginning of the injection:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="mi">25</span> <span class="mi">5</span> <span class="mi">1</span> <span class="mi">50</span> <span class="mi">10</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">10</span> <span class="s1">&#39;1* 10&#39;</span>
-</pre></div>
-</div>
-<p>The first value is defaulted (1*), and the second entry corresponds to TSMAXZ. Note that the TUNING units for the time quantites are in days, for the three SPE cases. See
-<a class="reference external" href="https://github.com/OPM/pyopmspe11/blob/main/examples/spe11c.toml">this configuration file</a> for an example setting more TUNING values, where entries are given for the three
-different records (lines) of the TUNING keyword.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Keep the linebreak between the sections (in the current implementation this is used for the reading of the parameters).</p>
-</div>
-</section>
-</section>
-<section id="toml">
-<span id="id2"></span><h2>toml<a class="headerlink" href="#toml" title="Link to this heading"></a></h2>
-<p>The previous configuration file can be written using the widely in-use <a class="reference external" href="https://docs.python.org/3/library/tomllib.html">toml format</a> as:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># Set the full path to the flow executable and flags</span>
-<span class="linenos"> 2</span><span class="n">flow</span> <span class="o">=</span> <span class="s2">&quot;flow --relaxed-max-pv-fraction=0 --enable-tuning=true --enable-opm-rst-file=true --output-extra-convergence-info=steps,iterations&quot;</span>
-<span class="linenos"> 3</span>
-<span class="linenos"> 4</span><span class="c1"># Set the model parameters</span>
-<span class="linenos"> 5</span><span class="n">spe11</span> <span class="o">=</span> <span class="s2">&quot;spe11c&quot;</span> <span class="c1"># Name of the spe case (spe11a, spe11b, or spe11c)</span>
-<span class="linenos"> 6</span><span class="n">version</span> <span class="o">=</span> <span class="s2">&quot;release&quot;</span> <span class="c1"># OPM Flow version (release or master)</span>
-<span class="linenos"> 7</span><span class="n">model</span> <span class="o">=</span> <span class="s2">&quot;complete&quot;</span> <span class="c1"># Name of the co2 model (immiscible, isothermal, convective, or complete)</span>
-<span class="linenos"> 8</span><span class="n">grid</span> <span class="o">=</span> <span class="s2">&quot;corner-point&quot;</span> <span class="c1"># Type of grid (cartesian, tensor, or corner-point)</span>
-<span class="linenos"> 9</span><span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="mf">8400.0</span><span class="p">,</span> <span class="mf">5000.0</span><span class="p">,</span> <span class="mf">1200.0</span><span class="p">]</span> <span class="c1"># Length, width, and depth [m]</span>
-<span class="linenos">10</span><span class="n">x_n</span> <span class="o">=</span> <span class="p">[</span><span class="mi">420</span><span class="p">]</span> <span class="c1"># If cartesian, number of x cells [-]; otherwise, variable array of x-refinement</span>
-<span class="linenos">11</span><span class="n">y_n</span> <span class="o">=</span> <span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">30</span><span class="p">]</span> <span class="c1"># If cartesian, number of y cells [-]; otherwise, variable array of y-refinement [-] (for spe11c)</span>
-<span class="linenos">12</span><span class="n">z_n</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span> <span class="c1"># If cartesian, number of z cells [-]; if tensor, variable array of z-refinement; if corner-point, fix array of z-refinement (11 or 18 entries)</span>
-<span class="linenos">13</span><span class="n">temperature</span> <span class="o">=</span> <span class="p">[</span><span class="mf">70.0</span><span class="p">,</span> <span class="mf">36.12</span><span class="p">]</span> <span class="c1"># Temperature bottom and top rig [C]</span>
-<span class="linenos">14</span><span class="n">datum</span> <span class="o">=</span> <span class="mi">300</span> <span class="c1"># Datum [m]</span>
-<span class="linenos">15</span><span class="n">pressure</span> <span class="o">=</span> <span class="mf">3e7</span> <span class="c1"># Pressure at the datum [Pa]</span>
-<span class="linenos">16</span><span class="n">kzMult</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="c1"># Multiplier for the permeability in the z direction [-]</span>
-<span class="linenos">17</span><span class="n">diffusion</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1e-9</span><span class="p">,</span> <span class="mf">2e-8</span><span class="p">]</span> <span class="c1"># Diffusion (in liquid and gas) [m^2/s]</span>
-<span class="linenos">18</span><span class="n">rockExtra</span> <span class="o">=</span> <span class="p">[</span><span class="mf">8.5e-1</span><span class="p">,</span> <span class="mf">2500.0</span><span class="p">]</span> <span class="c1"># Rock specific heat capacity [kJ/(kg K)] and rock density [kg/m^3] (for spe11b/c)</span>
-<span class="linenos">19</span><span class="n">pvAdded</span> <span class="o">=</span> <span class="mf">5e4</span>  <span class="c1"># Extra pore volume per area on lateral boundaries [m] (for spe11b/c)</span>
-<span class="linenos">20</span><span class="n">widthBuffer</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># Width of buffer cells [m] (for spe11b/c)</span>
-<span class="linenos">21</span><span class="n">elevation</span> <span class="o">=</span> <span class="mi">150</span> <span class="c1"># Maximum elevation difference (relative to the baseline gradient) of the arch in the y direction [m] (for spe11c)</span>
-<span class="linenos">22</span><span class="n">backElevation</span> <span class="o">=</span> <span class="mi">10</span> <span class="c1"># Back boundary elevation w.r.t the front boundary [m] (for spe11c)</span>
-<span class="linenos">23</span><span class="n">dispersion</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="c1"># Dispersion rock [m], facie 1 to 7</span>
-<span class="linenos">24</span><span class="n">rockCond</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.9</span><span class="p">,</span> <span class="mf">1.25</span><span class="p">,</span> <span class="mf">1.25</span><span class="p">,</span> <span class="mf">1.25</span><span class="p">,</span> <span class="mf">0.92</span><span class="p">,</span> <span class="mf">0.26</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">]</span> <span class="c1"># Thermal conductivity rock [W/(m K)], facie 1 to 7</span>
-<span class="linenos">25</span><span class="n">radius</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">]</span> <span class="c1"># Wells radius [m] (0 to use the SOURCE keyword instead of well keywords), well 1 to 2</span>
-<span class="linenos">26</span><span class="n">wellCoord</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">2700.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">5100.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">,</span> <span class="mf">700.0</span><span class="p">]]</span> <span class="c1"># Well positions: x, y, and z coordinates [m], well 1 to 2</span>
-<span class="linenos">27</span><span class="n">wellCoordF</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">2700.0</span><span class="p">,</span> <span class="mf">4000.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">5100.0</span><span class="p">,</span> <span class="mf">4000.0</span><span class="p">,</span> <span class="mf">700.0</span><span class="p">]]</span> <span class="c1"># Well final positions: x, y, and z coordinates [m], well 1 to 2 (for spe11c)</span>
-<span class="linenos">28</span>
-<span class="linenos">29</span><span class="c1"># Set the saturation functions</span>
-<span class="linenos">30</span><span class="n">krw</span> <span class="o">=</span> <span class="s2">&quot;(max(0, (s_w - swi) / (1 - swi))) ** 1.5&quot;</span>                                                         <span class="c1"># Wetting rel perm saturation function [-]</span>
-<span class="linenos">31</span><span class="n">krn</span> <span class="o">=</span> <span class="s2">&quot;(max(0, (1 - s_w - sni) / (1 - sni))) ** 1.5&quot;</span>                                                     <span class="c1"># Non-wetting rel perm saturation function [-]</span>
-<span class="linenos">32</span><span class="n">pcap</span> <span class="o">=</span> <span class="s2">&quot;penmax * math.erf(pen * ((s_w-swi) / (1.-swi)) ** (-(1.0 / 1.5)) * math.pi**0.5 / (penmax * 2))&quot;</span> <span class="c1"># Capillary pressure saturation function [Pa]</span>
-<span class="linenos">33</span><span class="n">s_w</span> <span class="o">=</span> <span class="s2">&quot;(np.exp(np.flip(np.linspace(0, 5.0, npoints))) - 1) / (np.exp(5.0) - 1)&quot;</span>                          <span class="c1"># Points to evaluate the saturation functions (s_w) [-]</span>
-<span class="linenos">34</span>
-<span class="linenos">35</span><span class="c1"># Properties sat functions: 1) swi [-], 2) sni [-], 3) pen [Pa], 4) penmax [Pa], and 5) npoints [-], facie 1 to 7</span>
-<span class="linenos">36</span><span class="n">safu</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.32</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">193531.39</span><span class="p">,</span> <span class="mf">3e7</span><span class="p">,</span> <span class="mi">1000</span><span class="p">],</span>
-<span class="linenos">37</span>        <span class="p">[</span><span class="mf">0.14</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">8654.99</span><span class="p">,</span>   <span class="mf">3e7</span><span class="p">,</span> <span class="mi">1000</span><span class="p">],</span>
-<span class="linenos">38</span>        <span class="p">[</span><span class="mf">0.12</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">6120.00</span><span class="p">,</span>   <span class="mf">3e7</span><span class="p">,</span> <span class="mi">1000</span><span class="p">],</span>
-<span class="linenos">39</span>        <span class="p">[</span><span class="mf">0.12</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">3870.63</span><span class="p">,</span>   <span class="mf">3e7</span><span class="p">,</span> <span class="mi">1000</span><span class="p">],</span>
-<span class="linenos">40</span>        <span class="p">[</span><span class="mf">0.12</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">3060.00</span><span class="p">,</span>   <span class="mf">3e7</span><span class="p">,</span> <span class="mi">1000</span><span class="p">],</span>
-<span class="linenos">41</span>        <span class="p">[</span><span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">2560.18</span><span class="p">,</span>   <span class="mf">3e7</span><span class="p">,</span> <span class="mi">1000</span><span class="p">],</span>
-<span class="linenos">42</span>        <span class="p">[</span><span class="mi">0</span><span class="p">,</span>      <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>   <span class="mf">3e7</span><span class="p">,</span>    <span class="mi">2</span><span class="p">]]</span>
-<span class="linenos">43</span>
-<span class="linenos">44</span><span class="c1"># Properties rock: 1) K [mD] and 2) phi [-], facie 1 to 7</span>
-<span class="linenos">45</span><span class="n">rock</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.10132</span><span class="p">,</span> <span class="mf">0.10</span><span class="p">],</span>
-<span class="linenos">46</span>        <span class="p">[</span><span class="mf">101.324</span><span class="p">,</span> <span class="mf">0.20</span><span class="p">],</span>
-<span class="linenos">47</span>        <span class="p">[</span><span class="mf">202.650</span><span class="p">,</span> <span class="mf">0.20</span><span class="p">],</span>
-<span class="linenos">48</span>        <span class="p">[</span><span class="mf">506.625</span><span class="p">,</span> <span class="mf">0.20</span><span class="p">],</span>
-<span class="linenos">49</span>        <span class="p">[</span><span class="mf">1013.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">],</span>
-<span class="linenos">50</span>        <span class="p">[</span><span class="mf">2026.50</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">],</span>
-<span class="linenos">51</span>        <span class="p">[</span><span class="mf">1e-5</span><span class="p">,</span>    <span class="mf">1e-6</span><span class="p">]]</span>
-<span class="linenos">52</span>
-<span class="linenos">53</span><span class="c1"># Define the injection values ([hours] for spe11a; [years] for spe11b/c): 1) injection time, 2) time step size to write results, 3) injected fluid (0 water, 1 co2) (well1), 4) injection rate [kg/s] (well1), 5) temperature [C] (well1), 6) injected fluid (0 water, 1 co2) (well2), 7) injection rate [kg/s] (well2), and 8) temperature [C] (well2). If --enable-tuning=1, then the TUNING values [days] as described in the OPM manual</span>
-<span class="linenos">54</span><span class="n">inj</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">999.9</span><span class="p">,</span> <span class="mf">999.9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
-<span class="linenos">55</span>       <span class="p">[</span>  <span class="mf">0.1</span><span class="p">,</span>   <span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
-<span class="linenos">56</span>       <span class="p">[</span>   <span class="mi">25</span><span class="p">,</span>     <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
-<span class="linenos">57</span>       <span class="p">[</span>   <span class="mi">25</span><span class="p">,</span>     <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
-<span class="linenos">58</span>       <span class="p">[</span>   <span class="mi">50</span><span class="p">,</span>    <span class="mi">25</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
-<span class="linenos">59</span>       <span class="p">[</span>  <span class="mi">400</span><span class="p">,</span>    <span class="mi">50</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
-<span class="linenos">60</span>       <span class="p">[</span>  <span class="mi">500</span><span class="p">,</span>   <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">]]</span>
-</pre></div>
-</div>
-<p>For additional examples of configuration files using toml, see the
-<a class="reference external" href="https://github.com/OPM/pyopmspe11/tree/main/examples">examples</a> and <a class="reference external" href="https://github.com/OPM/pyopmspe11/tree/main/tests/configs">configs</a> folders.</p>
-<section id="additional-definitions">
-<h3>Additional definitions<a class="headerlink" href="#additional-definitions" title="Link to this heading"></a></h3>
-<p>New features are being added using the toml format, while trying to keep the back compatibility to the <a class="reference internal" href="#txt"><span class="std std-ref">txt</span></a> configuration files.</p>
-<p>For the convective model, if this is set via a txt file, the following default values are added to the deck in the SCHEDULE section:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">DRSDTCON</span>
-<span class="linenos">2</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span>
-<span class="linenos">3</span><span class="mf">0.04</span> <span class="mf">0.34</span> <span class="mf">3.0e-09</span> <span class="n">ALL</span> <span class="o">/</span>
-<span class="linenos">4</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span>
-<span class="linenos">5</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span>
-<span class="linenos">6</span><span class="mf">0.04</span> <span class="mf">0.34</span> <span class="mf">3.0e-09</span> <span class="n">ALL</span> <span class="o">/</span>
-<span class="linenos">7</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span>
-<span class="linenos">8</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span>
-<span class="linenos">9</span><span class="o">/</span>
-</pre></div>
-</div>
-<p>These values can be set via the toml configuration file, by adding the following variable (see <a class="reference external" href="https://github.com/OPM/pyopmspe11/tree/main/examples/spe11b_convective.toml">spe11b_convective.toml</a>):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="c1"># Properties CO2 convective dissolution: 1) CHI [-], 2) PSI [-], 3) OMEGA [1/s], and 4) OPTION</span>
-<span class="linenos">2</span><span class="n">drsdtcon</span> <span class="o">=</span> <span class="p">[[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">],</span>
-<span class="linenos">3</span>           <span class="p">[</span><span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.34</span><span class="p">,</span> <span class="mf">3.0e-09</span><span class="p">,</span> <span class="s2">&quot;ALL&quot;</span><span class="p">],</span>
-<span class="linenos">4</span>           <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">],</span>
-<span class="linenos">5</span>           <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">],</span>
-<span class="linenos">6</span>           <span class="p">[</span><span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.34</span><span class="p">,</span> <span class="mf">3.0e-09</span><span class="p">,</span> <span class="s2">&quot;ALL&quot;</span><span class="p">],</span>
-<span class="linenos">7</span>           <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">],</span>
-<span class="linenos">8</span>           <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">]]</span>
-</pre></div>
-</div>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>By generating only the decks by setting the <strong>pyopmspe11</strong> flag ‘-m deck’, then one can add/remove/modify the values and keywords in the
-generated deck before running the simulation (i.e., after modification one can rerun <strong>pyopmspe11</strong> with the ‘-m flow’ flag to run the simulations).
-See the <a class="reference external" href="https://opm-project.org/?page_id=955">OPM Flow manual</a> for details on the keyword definitions.</p>
-</div>
-</section>
-</section>
-</section>
-
-
-           </div>
-          </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+</nav></div>
+      
     </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
 
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2023-2026, NORCE Research AS.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
         </div>
-      </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
+      
+      
+        <div class="navbar-item">
 
-</body>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/OPM/pyopmspe11/issues/new/choose" title="Report an issue" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-solid fa-bug fa-lg" aria-hidden="true"></i><span class="visually-hidden">Report an issue</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/OPM/pyopmspe11" title="GitHub repository" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub repository</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="introduction.html">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Configuration reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="examples.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="benchmark.html">
+    Benchmark
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="command-line.html">
+    Command-line reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="convergence.html">
+    Convergence
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    Python API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="output_folder.html">
+    Output folder
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="related.html">
+    Related projects
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/OPM/pyopmspe11/issues/new/choose" title="Report an issue" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-solid fa-bug fa-lg" aria-hidden="true"></i><span class="visually-hidden">Report an issue</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/OPM/pyopmspe11" title="GitHub repository" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub repository</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="configuration/model.html">Model selection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/grid.html">Grid and geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/initial-conditions.html">Initial conditions and boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/rock-fluid.html">Rock and fluid properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/wells-schedule.html">Wells and injection schedule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/convective.html">Convective dissolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/flow.html">OPM Flow settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/complete-example.html">Complete TOML example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/legacy-txt.html">Legacy TXT format</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Configuration reference</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="configuration-reference">
+<span id="configuration-file"></span><h1>Configuration reference<a class="headerlink" href="#configuration-reference" title="Link to this heading">#</a></h1>
+<p>A configuration file defines the SPE11 case, physical model, grid, initial
+conditions, rock and fluid properties, wells, injection schedule, and OPM Flow
+command.</p>
+<p>Use TOML for new cases. The legacy TXT format remains supported for existing
+configurations, but new configuration features are added only to TOML.</p>
+<p>Start from a configuration in the <a class="reference external" href="https://github.com/OPM/pyopmspe11/tree/main/examples">examples</a> or <a class="reference external" href="https://github.com/OPM/pyopmspe11/tree/main/benchmark">benchmark</a> directory. Follow the
+<a class="reference internal" href="tutorial.html"><span class="doc">Tutorial</span></a> for a guided workflow, and use this section to look up exact
+variable meanings, units, accepted values, and restrictions.</p>
+<section id="validation">
+<h2>Validation<a class="headerlink" href="#validation" title="Link to this heading">#</a></h2>
+<p><strong>pyopmspe11</strong> validates the configuration before generating files. Validation
+covers required values, types, numeric ranges, array and matrix dimensions,
+well coordinates, expressions, saturation and rock properties, injection
+schedules, convective-dissolution settings, and case-specific requirements.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="configuration/model.html">Model selection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/grid.html">Grid and geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/initial-conditions.html">Initial conditions and boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/rock-fluid.html">Rock and fluid properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/wells-schedule.html">Wells and injection schedule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/convective.html">Convective dissolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/flow.html">OPM Flow settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/complete-example.html">Complete TOML example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/legacy-txt.html">Legacy TXT format</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="installation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Installation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="configuration/model.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Model selection</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#validation">Validation</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/OPM/pyopmspe11/edit/main/docs/text/configuration_file.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/configuration_file.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2026, NORCE Research AS.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
 </html>

@@ -2,7 +2,7 @@
 [![Build Status](https://github.com/OPM/pyopmspe11/actions/workflows/ci_pyopmspe11_macos.yml/badge.svg)](https://github.com/OPM/pyopmspe11/actions/workflows/ci_pyopmspe11_macos.yml)
 [![Build Status](https://github.com/OPM/pyopmspe11/actions/workflows/ci_pyopmspe11_windows.yml/badge.svg)](https://github.com/OPM/pyopmspe11/actions/workflows/ci_pyopmspe11_windows.yml)
 [![Build Status](https://github.com/OPM/pyopmspe11/actions/workflows/ci_pyopmspe11_docker.yml/badge.svg)](https://github.com/OPM/pyopmspe11/actions/workflows/ci_pyopmspe11_docker.yml)
-<a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.11%20to%203.14-blue.svg"></a>
+<a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.12%20to%203.14-blue.svg"></a>
 [![Code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/license/mit/)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.07357/status.svg)](https://doi.org/10.21105/joss.07357)
@@ -21,15 +21,13 @@ To install the _pyopmspe11_ executable from the development version:
 pip install git+https://github.com/OPM/pyopmspe11.git
 ```
 
-If you are interested in a specific version (e.g., v2026.04) or in modifying the source code, then you can clone the repository and install the Python requirements in a virtual environment with the following commands:
+If you are interested in modifying the source code, then you can clone the repository and install the Python requirements in a virtual environment with the following commands:
 
 ```bash
 # Clone the repo
 git clone https://github.com/OPM/pyopmspe11.git
 # Get inside the folder
 cd pyopmspe11
-# For a specific version (e.g., v2026.04), or skip this step (i.e., edge version)
-git checkout v2026.04
 # Create virtual environment (to specific Python, python3.14 -m venv vpyopmspe11)
 python3 -m venv vpyopmspe11
 # Activate virtual environment

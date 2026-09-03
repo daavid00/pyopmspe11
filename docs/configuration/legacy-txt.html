@@ -1,0 +1,828 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Legacy TXT format &#8212; pyopmspe11 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=d109aa7d" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
+
+    <script src="../_static/documentation_options.js?v=1485e655"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=eef4a3d2"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'configuration/legacy-txt';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tutorial" href="../tutorial.html" />
+    <link rel="prev" title="Complete TOML example" href="complete-example.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2026.10rc0" />
+    <meta name="docbuild:last-update" content="2026-09-03"/>
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/pyopmspe11.svg" class="logo__image only-light" alt="pyopmspe11 documentation - Home"/>
+    <img src="../_static/pyopmspe11.svg" class="logo__image only-dark pst-js-only" alt="pyopmspe11 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../introduction.html">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../configuration_file.html">
+    Configuration reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../benchmark.html">
+    Benchmark
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../command-line.html">
+    Command-line reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../convergence.html">
+    Convergence
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../api.html">
+    Python API
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../output_folder.html">
+    Output folder
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../related.html">
+    Related projects
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/OPM/pyopmspe11/issues/new/choose" title="Report an issue" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-solid fa-bug fa-lg" aria-hidden="true"></i><span class="visually-hidden">Report an issue</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/OPM/pyopmspe11" title="GitHub repository" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub repository</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../introduction.html">
+    Introduction
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../configuration_file.html">
+    Configuration reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorial.html">
+    Tutorial
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../benchmark.html">
+    Benchmark
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../command-line.html">
+    Command-line reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../convergence.html">
+    Convergence
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api.html">
+    Python API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../output_folder.html">
+    Output folder
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../related.html">
+    Related projects
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/OPM/pyopmspe11/issues/new/choose" title="Report an issue" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-solid fa-bug fa-lg" aria-hidden="true"></i><span class="visually-hidden">Report an issue</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/OPM/pyopmspe11" title="GitHub repository" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub repository</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="model.html">Model selection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grid.html">Grid and geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="initial-conditions.html">Initial conditions and boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rock-fluid.html">Rock and fluid properties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wells-schedule.html">Wells and injection schedule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="convective.html">Convective dissolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flow.html">OPM Flow settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="complete-example.html">Complete TOML example</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Legacy TXT format</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../configuration_file.html" class="nav-link">Configuration reference</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Legacy TXT format</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="legacy-txt-format">
+<span id="configuration-legacy-txt"></span><h1>Legacy TXT format<a class="headerlink" href="#legacy-txt-format" title="Link to this heading">#</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The TXT format remains supported for existing configurations. Use TOML for
+new cases because new configuration features are added only to TOML.</p>
+</div>
+<p>The TXT reader expects ordered sections and uses blank lines to separate them.
+Do not remove the line breaks between sections.</p>
+<section id="flow-command">
+<h2>Flow command<a class="headerlink" href="#flow-command" title="Link to this heading">#</a></h2>
+<p>The first entry defines the Flow executable and its command-line options. Use
+the full executable path when <code class="docutils literal notranslate"><span class="pre">flow</span></code> is not available on <code class="docutils literal notranslate"><span class="pre">PATH</span></code>. MPI can be
+included in the same line.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>"""Set the full path to the flow executable and flags"""
+flow --relaxed-max-pv-fraction=0 --enable-tuning=true --enable-opm-rst-file=true --output-extra-convergence-info=steps,iterations
+</pre></div>
+</div>
+<p>For an MPI build, prepend the launcher and number of processes, for example
+<code class="docutils literal notranslate"><span class="pre">mpirun</span> <span class="pre">-np</span> <span class="pre">8</span> <span class="pre">flow</span> <span class="pre">...</span></code>.</p>
+</section>
+<section id="reservoir-parameters">
+<h2>Reservoir parameters<a class="headerlink" href="#reservoir-parameters" title="Link to this heading">#</a></h2>
+<p>The model section defines the benchmark case, OPM Flow version, physical model,
+grid, dimensions, refinement, initial conditions, boundary settings, and
+case-specific geometry. Keep the comments when creating or modifying a legacy
+configuration because they identify the meaning and units of every entry.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>"""Set the model parameters"""
+spe11c master     # Name of the SPE case (spe11a, spe11b, or spe11c) and OPM Flow version (master or release)
+complete          # CO2 model (immiscible, isothermal, convective, or complete)
+corner-point      # Grid type (cartesian, tensor, or corner-point)
+8400 5000 1200    # Length, width, and depth [m]
+420               # For Cartesian grids, number of x cells; otherwise, variable x-refinement array [-]
+30,40,50,40,30    # For Cartesian grids, number of y cells; otherwise, variable y-refinement array [-] (SPE11C)
+5,3,1,2,3,2,4,4,10,4,6,6,4,8,4,15,30,9 # For Cartesian grids, number of z cells; for tensor grids, variable z-refinement; for corner-point grids, fixed 11- or 18-entry z-refinement array [-]
+70 36.12          # Bottom and top-rig temperatures [degrees Celsius]
+300 3e7 0.1       # Datum [m], pressure at the datum [Pa], and vertical-permeability multiplier [-]
+1e-9 2e-8         # Molecular diffusion in the liquid and gas phases [m2/s]
+8.5e-1 2500       # Rock specific heat capacity [kJ/(kg K)] and density [kg/m3] (SPE11B and SPE11C)
+0 5e4 1           # Added top-boundary pore volume for SPE11A (0 selects free flow), lateral-boundary pore volume, and buffer-cell width [m] for SPE11B and SPE11C
+150 10            # Maximum y-direction arch elevation and back-boundary elevation relative to the front boundary [m] (SPE11C)
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="model.html"><span class="doc">Model selection</span></a>, <a class="reference internal" href="grid.html"><span class="doc">Grid and geometry</span></a>, and <a class="reference internal" href="initial-conditions.html"><span class="doc">Initial conditions and boundaries</span></a> for the complete
+variable descriptions and validation rules.</p>
+</section>
+<section id="rock-and-saturation-properties">
+<h2>Rock and saturation properties<a class="headerlink" href="#rock-and-saturation-properties" title="Link to this heading">#</a></h2>
+<p>The saturation-function section defines the wetting and non-wetting relative
+permeabilities, capillary pressure, points used to tabulate the functions, and
+the facies-dependent saturation properties.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>"""Set the saturation functions"""
+(max(0, (s_w - swi) / (1 - swi))) ** 1.5                                                        # Wetting relative-permeability function [-]
+(max(0, (1 - s_w - sni) / (1 - sni))) ** 1.5                                                    # Non-wetting relative-permeability function [-]
+penmax * math.erf(pen * ((s_w-swi) / (1.-swi)) ** (-(1.0 / 1.5)) * math.pi**0.5 / (penmax * 2)) # Capillary-pressure function [Pa]
+(np.exp(np.flip(np.linspace(0, 5.0, npoints))) - 1) / (np.exp(5.0) - 1)                         # Wetting-saturation points used to evaluate the functions [-]
+
+"""Properties sat functions"""
+"""swi [-], sni [-], pen [Pa], penmax [Pa], npoints [-]"""
+SWI1 0.32 SNI1 0.1 PEN1 193531.39 PENMAX1 3e7 NPOINTS1 1000  # Facies 1
+SWI2 0.14 SNI2 0.1 PEN2   8654.99 PENMAX2 3e7 NPOINTS2 1000  # Facies 2
+SWI3 0.12 SNI3 0.1 PEN3   6120.00 PENMAX3 3e7 NPOINTS3 1000  # Facies 3
+SWI4 0.12 SNI4 0.1 PEN4   3870.63 PENMAX4 3e7 NPOINTS4 1000  # Facies 4
+SWI5 0.12 SNI5 0.1 PEN5   3060.00 PENMAX5 3e7 NPOINTS5 1000  # Facies 5
+SWI6 0.10 SNI6 0.1 PEN6   2560.18 PENMAX6 3e7 NPOINTS6 1000  # Facies 6
+SWI7    0 SNI7   0 PEN7         0 PENMAX7 3e7 NPOINTS7    2  # Facies 7
+</pre></div>
+</div>
+<p>The rock-property section defines permeability, porosity, dispersivity, and
+thermal conductivity for every facies.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>"""Properties rock"""
+"""K [mD], phi [-], disp [m], thconr [W m-1 K-1]"""
+PERM1 0.10132 PORO1 0.10 DISP1 10 THCONR1 1.90  # Facies 1
+PERM2 101.324 PORO2 0.20 DISP2 10 THCONR2 1.25  # Facies 2
+PERM3 202.650 PORO3 0.20 DISP3 10 THCONR3 1.25  # Facies 3
+PERM4 506.625 PORO4 0.20 DISP4 10 THCONR4 1.25  # Facies 4
+PERM5 1013.25 PORO5 0.25 DISP5 10 THCONR5 0.92  # Facies 5
+PERM6 2026.50 PORO6 0.35 DISP6 10 THCONR6 0.26  # Facies 6
+PERM7    1e-5 PORO7 1e-6 DISP7  0 THCONR7 2.00  # Facies 7
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="rock-fluid.html"><span class="doc">Rock and fluid properties</span></a> for the TOML equivalents, units, matrix layouts, and
+validation rules.</p>
+</section>
+<section id="wells-and-schedule">
+<h2>Wells and schedule<a class="headerlink" href="#wells-and-schedule" title="Link to this heading">#</a></h2>
+<p>The final sections define the radius and coordinates of each well, followed by
+the injection schedule. An optional quoted value at the end of a schedule row
+sets OPM <code class="docutils literal notranslate"><span class="pre">TUNING</span></code> values.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>"""Wells radius and position"""
+"""radius (0 selects SOURCE), initial x, y, z, and final x, y, z [m] (final coordinates apply to SPE11C)"""
+0.15 2700. 1000. 300. 2700. 4000. 300. # Well 1
+0.15 5100. 1000. 700. 5100. 4000. 700. # Well 2
+
+"""Define the injection values ([hours] for SPE11A; [years] for SPE11B and SPE11C)"""
+"""1) duration, 2) result interval, 3) fluid well 1, 4) rate well 1 [kg/s], 5) temperature well 1 [degrees Celsius], 6) fluid well 2, 7) rate well 2 [kg/s], 8) temperature well 2 [degrees Celsius], and optional TUNING values [days]"""
+999.9 999.9 1  0 10 1  0 10 # Initial period without injection
+  0.1   0.1 1  0 10 1  0 10 # Short initialization period
+   25     5 1 50 10 1  0 10 # Inject CO2 through well 1
+   25     5 1 50 10 1 50 10 # Inject CO2 through wells 1 and 2
+   50    25 1  0 10 1  0 10 # Post-injection period
+  400    50 1  0 10 1  0 10 # Long-term migration period
+  500   100 1  0 10 1  0 10 # Final monitoring period
+</pre></div>
+</div>
+<p>Here, fluid <code class="docutils literal notranslate"><span class="pre">0</span></code> means water and fluid <code class="docutils literal notranslate"><span class="pre">1</span></code> means CO2. See
+<a class="reference internal" href="wells-schedule.html"><span class="doc">Wells and injection schedule</span></a> for detailed column definitions and TUNING guidance.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">--enable-tuning=true</span></code> is included in the Flow command, append the
+corresponding TUNING values to an injection row. For example, to set a
+maximum time step of 10 days at the beginning of injection:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>25 5 1 50 10 1 0 10 '1* 10' # First TUNING value defaulted; second value sets TSMAXZ
+</pre></div>
+</div>
+<p>TUNING time quantities are expressed in days for all three SPE cases. See
+the <a class="reference external" href="https://opm-project.org/?page_id=955">OPM Flow manual</a> for all 34
+options and their default values.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Preserve the blank line between legacy TXT sections. The current parser uses
+these line breaks to separate and read the parameter groups.</p>
+</div>
+</section>
+<section id="modify-generated-decks">
+<h2>Modify generated decks<a class="headerlink" href="#modify-generated-decks" title="Link to this heading">#</a></h2>
+<p>A legacy configuration can still generate only the deck:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pyopmspe11 -i input.txt -o output -m deck</span>
+</pre></div>
+</div>
+<p>After generation, modify the OPM input files and run the simulation with
+<code class="docutils literal notranslate"><span class="pre">-m</span> <span class="pre">flow</span></code> when appropriate. See the <a class="reference external" href="https://opm-project.org/?page_id=955">OPM Flow manual</a> for keyword definitions.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="complete-example.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Complete TOML example</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../tutorial.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Tutorial</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#flow-command">Flow command</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reservoir-parameters">Reservoir parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rock-and-saturation-properties">Rock and saturation properties</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#wells-and-schedule">Wells and schedule</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modify-generated-decks">Modify generated decks</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/OPM/pyopmspe11/edit/main/docs/text/configuration/legacy-txt.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/configuration/legacy-txt.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2026, NORCE Research AS.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -24,7 +24,7 @@ DISGASW
 VAPWAT
 ${"DIFFUSE\n" if(diffusion[0] + diffusion[1]) > 0 else ""}\
 % endif
-${"THERMAL\n" if model in ["complete", "convective"] else ""}\
+${"THERMAL\n" if model in ["complete"] else ""}\
 
 METRIC
 
@@ -100,7 +100,7 @@ PERMY   ${f"{rock[i][0]:E}"} ${i+1} F /
 % for i in range(7):
 PERMZ   ${f"{rock[i][0]*kzMult:E}"} ${i+1} F /
 % endfor
-% if model in ["complete", "convective"]:
+% if model in ["complete"]:
 % for i in range(7):
 THCONR  ${f"{rockCond[i]:E}"} ${i+1} F /
 % endfor
@@ -149,7 +149,7 @@ ${diffusion[1]} ${diffusion[1]} /
 % endif
 % endif
 
-% if model in ["complete", "convective"]:
+% if model in ["complete"]:
 SPECROCK
 ${min(temperature[0], temperature[1])} ${rockExtra[0]*rockExtra[1]}
 ${max(temperature[0], temperature[1]) if temperature[0]!=temperature[1] else temperature[0]+1} ${rockExtra[0]*rockExtra[1]} / --Table 1
@@ -284,7 +284,7 @@ INJ${i} ${'GAS' if inj[j][2+3*i] > 0 else 'WATER'} ${'OPEN' if inj[j][3+3*i] > 0
 SOURCE
 % for i in range(len(wellijk)):
 % if radius[i] == 0:
-${wellijk[i][0]} ${wellijk[i][1]} ${wellijk[i][2]} ${'GAS' if inj[j][2+3*i] > 0 else 'WATER'} ${f"{inj[j][3+3*i] * 86400:E}"} ${f"1* {inj[j][4+3*i]:E} " if model in ["complete", "convective"] else ""}/
+${wellijk[i][0]} ${wellijk[i][1]} ${wellijk[i][2]} ${'GAS' if inj[j][2+3*i] > 0 else 'WATER'} ${f"{inj[j][3+3*i] * 86400:E}"} ${f"1* {inj[j][4+3*i]:E} " if model in ["complete"] else ""}/
 % endif
 % if lower:
 <% break %>
@@ -292,7 +292,7 @@ ${wellijk[i][0]} ${wellijk[i][1]} ${wellijk[i][2]} ${'GAS' if inj[j][2+3*i] > 0 
 % endfor
 /
 % endif
-% if model in ["complete", "convective"] and max(radius) > 0:
+% if model in ["complete"] and max(radius) > 0:
 WTEMP
 % for i in range(len(wellijk)):
 % if radius[i] > 0:

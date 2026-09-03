@@ -19,7 +19,6 @@ classifiers = [
     "Natural Language :: English",
     "Topic :: Scientific/Engineering",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
@@ -35,7 +34,7 @@ dependencies = [
     "scipy",
     "shapely",
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 
 [tool.setuptools.dynamic]
 version = {attr = "pyopmspe11.__version__"}

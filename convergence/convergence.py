@@ -68,9 +68,9 @@ for index, size in enumerate(SIZES):
 vals = int(np.ceil(len(SIZES) / 2))
 cols = int(2.5 * vals)
 run_command(
-    f"plopm -i '{names.strip()}' -save {DOMAIN}_spatial_map_all -z 0 -v xco2l "
-    f"-c cet_CET_CBTL1_r -clabel 'mass fraction of CO2 in liquid [-]' -d 16,{cols} "
-    f"-cformat .2e -subfigs {vals},2 -cbsfax 0.35,0.97,0.3,0.02 -delax 1 -suptitle 0 "
+    f"plopm -i '{names.strip()}' -fn {DOMAIN}_spatial_map_all -asp 0 -v xco2l "
+    f"-c cet_CET_CBTL1_r -cbl 'mass fraction of CO2 in liquid [-]' -fs 16,{cols} "
+    f"-cbf .2e -sg {vals},2 -cbp 0.35,0.97,0.3,0.02 -rdl 1 -st 0 "
     f"-t '{legend.strip()}'"
 )
 
@@ -80,16 +80,16 @@ for index, size in enumerate(SIZES):
     case_name = f"{DOMAIN}_cp{index}-z{size}mish-x{size}m"
     parallel_command += (
         f"plopm -i {case_name}/{case_name.upper()} "
-        + f"-save {DOMAIN}_spatial_map_{case_name} -z 0 -v xco2l "
-        + "-clabel 'mass fraction of CO2 in liquid [-]' -remove 1,1,1,1 "
-        + "-c cet_CET_CBTL1_r -d 16,5 -cformat .2e -b '[0,6.36e-2]' & "
+        + f"-fn {DOMAIN}_spatial_map_{case_name} -asp 0 -v xco2l "
+        + "-cbl 'mass fraction of CO2 in liquid [-]' -hide 1,1,1,1 "
+        + "-c cet_CET_CBTL1_r -fs 16,5 -cbf .2e -cl '[0,6.36e-2]' & "
     )
 run_command(parallel_command + "wait")
 
 # Example of plotting a time series variable (from simulation files .SMSPEC)
 run_command(
-    f"plopm -i '{names.strip()}' -v {QUANTITY} -save {DOMAIN}_{QUANTITY} -ylabel "
-    f"'{QUANTITY} [s]' -tunits y -labels '{legend.strip()}' -xformat .0f -e solid -lw 4"
+    f"plopm -i '{names.strip()}' -v {QUANTITY} -fn {DOMAIN}_{QUANTITY} -yl "
+    f"'{QUANTITY} [s]' -tu y -llb '{legend.strip()}' -xf .0f -ls solid -lw 4"
 )
 
 # Time series from CSV files
@@ -126,9 +126,9 @@ for case_type in ["time_series", "performance_time_series_detailed"]:
                     )
         variable = quantities[column_index].split(" ")[0]
         run_command(
-            f"plopm -i '{input_names.strip()}' -c '{COLORS}' -csv '1,{column_index + 1}' "
-            f"-save {DOMAIN}_{variable} -ylabel '{quantities[column_index]}' "
-            f"-tunits y -labels '{case_legend.strip()}' -xformat .0f -e solid -lw 4"
+            f"plopm -i '{input_names.strip()}' -c '{COLORS}' -cc '1,{column_index + 1}' "
+            f"-fn {DOMAIN}_{variable} -yl '{quantities[column_index]}' "
+            f"-tu y -llb '{case_legend.strip()}' -xf .0f -ls solid -lw 4"
         )
 
 # Get the SPE11B benchmark data from the participants to compare our results
@@ -202,9 +202,9 @@ for index, size in enumerate(SIZES):
     participant_names += f"{DOMAIN}_cp{index}-z{size}mish-x{size}m/spe11b_time_series "
     participant_colors += f"{COLORS.split(',')[index]},"
 run_command(
-    f"plopm -i '{participant_names.strip()}' -csv '1,3' -c '{participant_colors.strip(',')}' "
-    f"-save {DOMAIN}_mobA_adding_participants -y '[2.1e7,4e7]' -ylabel 'mobA [kg]' -tunits y "
-    "-loc empty -xlog 1 -e solid -lw 2"
+    f"plopm -i '{participant_names.strip()}' -cc '1,3' -c '{participant_colors.strip(',')}' "
+    f"-fn {DOMAIN}_mobA_adding_participants -y '[2.1e7,4e7]' -yl 'mobA [kg]' -tu y "
+    "-ll empty -xlog 1 -ls solid -lw 2"
 )
 
 # Spatial maps into a single figure adding all SPE11B participants (from csvs)
@@ -221,8 +221,9 @@ for index, size in enumerate(SIZES):
 grid_x = int(8 + np.ceil((len(SIZES) - 1) / 5))
 grid_y = int(15.5 + 2.5 * np.floor(len(SIZES) / 2))
 run_command(
-    f"plopm -i '{map_names.strip()}' -csv '1,2,9' -save {DOMAIN}_spatial_map_adding_participants "
-    "-z 0 -f 24 -b '[0,5e3]' -clabel 'total CO$_2$ mass [kg] at 500 years' -c cet_CET_CBTL1_r -d "
-    f"60,{grid_y} -cformat .2e -subfigs {grid_x},5 -cbsfax 0.35,0.97,0.3,0.02 -delax 1 "
-    f"-suptitle 0 -t '{map_titles.strip()}'"
+    f"plopm -i '{map_names.strip()}' -cc '1,2,9' -fn {DOMAIN}_spatial_map_adding_participants "
+    "-asp 0 -fz 24 -cl '[0,5e3]' -cbl 'total CO$_2$ mass [kg] at 500 years' "
+    "-c cet_CET_CBTL1_r -fs "
+    f"60,{grid_y} -cbf .2e -sg {grid_x},5 -cbp 0.35,0.97,0.3,0.02 -rdl 1 "
+    f"-st 0 -t '{map_titles.strip()}'"
 )
