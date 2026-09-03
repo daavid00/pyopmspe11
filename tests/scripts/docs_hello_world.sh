@@ -12,8 +12,6 @@ done
 wait
 cd $OUT
 pyopmspe11 -c spe11b
-cp -a compare/. .
-rm -rf compare
 cd ../..
 plopm -i $OUT/isothermal/flow/ISOTHERMAL -v sgas -t 'Isothermal simulation (end of simulation)' -o $OUT
-plopm -i "$OUT/immiscible/data/spe11b_time_series $OUT/convective/data/spe11b_time_series" -o $OUT -csv 1,4 -labels "Immiscible  Convective" -tunits y -ylabel 'mobA [kg]' -xformat .0f -x '[0,25]' -xlnum 6 -f 20 -d 10,5 -yformat .1e -e 'solid,solid' -lw 4 -step 1
+plopm -i "$OUT/immiscible/data/spe11b_time_series $OUT/convective/data/spe11b_time_series" -o $OUT -cc 1,4 -llb "Immiscible  Convective" -tu y -yl 'mobA [kg]' -xf .0f -x '[0,25]' -xnt 6 -fz 20 -fs 10,5 -yf .1e -ls 'solid,solid' -lw 4 -sp 1

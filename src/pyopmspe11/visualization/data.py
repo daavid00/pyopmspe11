@@ -2,7 +2,13 @@
 # SPDX-License-Identifier: MIT
 # pylint: disable=C0302,R0912,R0914,R0801,R0915,E1102,C0325,R0902,R0913,R0917,R0911
 
-"""Script to write the benchmark data"""
+"""Generate SPE11 benchmark CSV data from OPM Flow results.
+
+The module reads INIT, UNRST, EGRID, SMSPEC, and INFOSTEP data and supports four
+outputs: performance time series, sparse benchmark quantities, dense spatial
+maps, and spatial performance metrics. Simulation cells are mapped to the
+regular benchmark reporting grid by aligned-grid or polygon-intersection methods.
+"""
 
 import argparse
 import csv
@@ -23,6 +29,12 @@ from rtree import index
 from scipy.interpolate import interp1d
 from shapely.geometry import Polygon
 
+from pyopmspe11.utils.terminal import (
+    pyopmspe11_error,
+    pyopmspe11_info,
+    pyopmspe11_success,
+)
+
 GAS_DEN_REF = 1.86843
 WAT_DEN_REF = 998.108
 SECONDS_IN_YEAR = 31536000
@@ -30,8 +42,32 @@ SGAS_THR = 0.097
 
 
 @dataclass(slots=True)
-class BenchmarkConfig:
-    """Paths and benchmark settings"""
+class DataConfig:
+    """Paths and benchmark settings used to generate CSV output.
+
+    Attributes
+    ----------
+    outfol
+        Base directory containing the generated deck and Flow results.
+    case
+        SPE11 case identifier.
+    mode
+        Requested combination of dense, sparse, and performance outputs.
+    lower
+        Whether processing is restricted to the lower neighbourhood.
+    deckfol, flowfol, where
+        Directories containing the deck, Flow results, and generated CSV files.
+    nxyz
+        Reporting-grid cell counts along x, y, and z.
+    dims
+        Physical reporting-grid dimensions.
+    denset
+        Simulation times requested for dense output, in seconds.
+    sparset
+        Sparse and performance sampling interval, in seconds.
+    nocellsrepgrid
+        Total number of cells in the benchmark reporting grid.
+    """
 
     outfol: str
     case: str
@@ -49,7 +85,42 @@ class BenchmarkConfig:
 
 @dataclass(slots=True)
 class SimulationData:
-    """Simulation data"""
+    """OPM readers and derived metadata for one simulation result set.
+
+    Arrays in global order contain all grid cells. Active arrays follow the indexing
+    used by INIT and UNRST properties.
+
+    Attributes
+    ----------
+    simres
+        Common path stem of the simulation result files.
+    unrst, init, egrid, smspec
+        OPM readers for restart, initialization, grid, and summary data.
+    times
+        Restart times measured from the detected injection start.
+    timesumary
+        Summary times measured from the same injection start.
+    timeini
+        Absolute simulation time at the detected injection start.
+    noskiprst
+        Restart index immediately before or at the injection start.
+    norst
+        Number of restart report steps.
+    porv, porva
+        Pore volume in global and active-cell order.
+    actind
+        Global indices of active cells.
+    immiscible, isothermal
+        Whether dissolved components or thermal variables are absent.
+    cornpoint
+        Whether the simulation uses the corner-point grid layout handled here.
+    nocellst, nocellsa, nocellsxz
+        Total, active, and x-z plane cell counts.
+    dof
+        Number of primary degrees of freedom per active cell.
+    simdim
+        Simulation-grid dimensions along x, y, and z.
+    """
 
     simres: str
     unrst: OpmRestart
@@ -74,35 +145,23 @@ class SimulationData:
     simdim: list
 
 
-def main(argv=None) -> None:
-    """Postprocess simulation results into benchmark CSVs"""
-    parser = argparse.ArgumentParser(description="Main script to process the data")
-    parser.add_argument("-p", "--path", default="output", help="Output folder")
-    parser.add_argument("-d", "--deck", default="spe11b", help="Simulated case")
-    parser.add_argument("-r", "--resolution", default="10,1,5", help="x,y,z elements")
-    parser.add_argument(
-        "-t",
-        "--time",
-        default="24",
-        help="Dense output time(s): spe11a [h], spe11b/c [y]",
-    )
-    parser.add_argument(
-        "-w",
-        "--write",
-        default="0.1",
-        help="Sparse/performance interval: spe11a [h], spe11b/c [y]",
-    )
-    parser.add_argument(
-        "-g",
-        "--generate",
-        default="sparse",
-        help="dense, sparse, performance, performance-spatial or combinations",
-    )
-    parser.add_argument(
-        "-n", "--neighbourhood", default="", help="Region: 'lower' or all"
-    )
-    parser.add_argument("-f", "--subfolders", default=1, help="Create subfolders")
-    cmdargs = vars(parser.parse_known_args(argv)[0])
+def generate_data(cmdargs: dict) -> list[str]:
+    """Generate the requested SPE11 benchmark CSV files.
+
+    The function initializes readers once and dispatches performance, sparse,
+    dense, and performance-spatial processing according to the selected mode.
+
+    Parameters
+    ----------
+    cmdargs : dict
+        Parsed data-generation arguments.
+
+    Returns
+    -------
+    list[str]
+        Names of the generated benchmark CSV files.
+    """
+    generated_files: list[str] = []
     cfg = build_config_from_args(cmdargs)
     sim = read_simulations(cfg)
 
@@ -113,7 +172,9 @@ def main(argv=None) -> None:
         "performance_sparse",
         "dense_performance_sparse",
     ):
-        performance(cfg, sim)
+        generate_performance_data(cfg, sim)
+        generated_files.append(f"{cfg.case}_performance_time_series.csv")
+        generated_files.append(f"{cfg.case}_performance_time_series_detailed.csv")
     if cfg.mode in (
         "all",
         "sparse",
@@ -121,7 +182,8 @@ def main(argv=None) -> None:
         "dense_performance_sparse",
         "performance_sparse",
     ):
-        sparse_data(cfg, sim)
+        generate_sparse_data(cfg, sim)
+        generated_files.append(f"{cfg.case}_time_series.csv")
     if cfg.mode in (
         "all",
         "performance-spatial",
@@ -134,12 +196,23 @@ def main(argv=None) -> None:
         if isinstance(cfg.denset, float):
             dt = cfg.denset
             cfg.denset = [i * dt for i in range(int(np.floor(sim.times[-1] / dt)) + 1)]
-        dense_data(cfg, sim)
-    print(f"The csv files have been written to {cfg.where}")
+        generated_files.extend(generate_dense_data(cfg, sim))
+    return generated_files
 
 
-def build_config_from_args(cmdargs: dict) -> BenchmarkConfig:
-    """Prepare the methods according to the spe11x case"""
+def build_config_from_args(cmdargs: dict) -> DataConfig:
+    """Build data-generation settings from parsed arguments.
+
+    Parameters
+    ----------
+    cmdargs : dict
+        Parsed data-generation arguments.
+
+    Returns
+    -------
+    DataConfig
+        Initialized benchmark data settings.
+    """
     outfol = cmdargs["path"].strip()
     case = cmdargs["deck"].strip()
     mode = cmdargs["generate"].strip()
@@ -168,7 +241,7 @@ def build_config_from_args(cmdargs: dict) -> BenchmarkConfig:
     if case == "spe11c":
         dims[1] = 5000.0
     nocellsrepgrid = nxyz[0] * nxyz[1] * nxyz[2]
-    return BenchmarkConfig(
+    return DataConfig(
         outfol=outfol,
         case=case,
         mode=mode,
@@ -184,31 +257,56 @@ def build_config_from_args(cmdargs: dict) -> BenchmarkConfig:
     )
 
 
-def read_simulations(cfg: BenchmarkConfig) -> SimulationData:
-    """Use opm Python package to read the results"""
+def read_simulations(cfg: DataConfig) -> SimulationData:
+    """Open OPM result files and derive shared simulation metadata.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+
+    Returns
+    -------
+    SimulationData
+        Loaded OPM readers and derived simulation metadata.
+    """
     simres = f"{cfg.flowfol}/{cfg.outfol.split('/')[-1].upper()}"
     unrst = OpmRestart(f"{simres}.UNRST")
     immiscible = unrst.count("RSW", 0) == 0
     isothermal = unrst.count("TEMP", 0) == 0
     dof = 2 if isothermal else 3
-    time = []
-    times: list[float] = []
-    timeini = 0
-    noskiprst = 0
-    for i in range(len(unrst.report_steps)):
-        t = 86400 * unrst["DOUBHEAD", i][0]
-        time.append(t)
-        if not times:
-            if (not immiscible and np.max(unrst["RSW", i]) > 0) or (
-                immiscible and np.max(unrst["SGAS", i]) > 0
-            ):
-                timeini = 86400 * unrst["DOUBHEAD", i - 1][0]
-                noskiprst = i - 1
-                times = [0, t - timeini]
+    absolute_times = []
+    relative_times: list[float] = []
+    initial_time = 0.0
+    first_restart_index = 0
+
+    for restart_index in range(len(unrst.report_steps)):
+        absolute_time = 86400.0 * unrst["DOUBHEAD", restart_index][0]
+        absolute_times.append(absolute_time)
+
+        if relative_times:
+            relative_times.append(absolute_time - initial_time)
+            continue
+
+        injection_detected = (
+            np.max(unrst["RSW", restart_index]) > 0
+            if not immiscible
+            else np.max(unrst["SGAS", restart_index]) > 0
+        )
+
+        if not injection_detected:
+            continue
+
+        first_restart_index = max(0, restart_index - 1)
+        initial_time = absolute_times[first_restart_index]
+
+        if restart_index == 0:
+            relative_times = [0.0]
         else:
-            times.append(t - timeini)
-    if not times:
-        times = time
+            relative_times = [0.0, absolute_time - initial_time]
+
+    if not relative_times:
+        relative_times = absolute_times
     init = OpmFile(f"{simres}.INIT")
     egrid = OpmGrid(f"{simres}.EGRID")
     smspec = OpmSummary(f"{simres}.SMSPEC")
@@ -218,7 +316,7 @@ def read_simulations(cfg: BenchmarkConfig) -> SimulationData:
     porva = np.array([p for p in porv if p > 0])
     nocellst = len(porv)
     nocellsa = egrid.active_cells
-    timesumary = [0.0] + list(86400.0 * smspec["TIME"] - timeini)
+    timesumary = [0.0] + list(86400.0 * smspec["TIME"] - initial_time)
     dims = egrid.dimension
     simdim = [dims[0], dims[1], dims[2]]
     nocellsxz = dims[0] * dims[2]
@@ -229,9 +327,9 @@ def read_simulations(cfg: BenchmarkConfig) -> SimulationData:
         immiscible=immiscible,
         isothermal=isothermal,
         dof=dof,
-        times=times,
-        timeini=timeini,
-        noskiprst=noskiprst,
+        times=relative_times,
+        timeini=initial_time,
+        noskiprst=first_restart_index,
         init=init,
         egrid=egrid,
         smspec=smspec,
@@ -248,14 +346,37 @@ def read_simulations(cfg: BenchmarkConfig) -> SimulationData:
     )
 
 
-def performance(cfg: BenchmarkConfig, sim: SimulationData) -> None:
-    """Generate benchmark performance data"""
+def generate_performance_data(cfg: DataConfig, sim: SimulationData) -> None:
+    """Generate regular and detailed performance CSV data.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    """
     perf = build_performance_data(cfg, sim)
     write_performance_csv(cfg, perf)
 
 
-def read_infostep(cfg: BenchmarkConfig, sim: SimulationData) -> tuple[list, NDArray]:
-    """Read INFOSTEP file"""
+def read_infostep_data(cfg: DataConfig, sim: SimulationData) -> tuple[list, NDArray]:
+    """Read solver-step records from the INFOSTEP file.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+
+    Returns
+    -------
+    tags : list[str]
+        Column names read from the INFOSTEP header.
+    infosteps : NDArray
+        Numeric INFOSTEP rows at or after the selected simulation start.
+    """
     infosteps = []
     with open(
         f"{cfg.flowfol}/{cfg.outfol.split('/')[-1].upper()}.INFOSTEP",
@@ -271,9 +392,23 @@ def read_infostep(cfg: BenchmarkConfig, sim: SimulationData) -> tuple[list, NDAr
     return tags, np.array(infosteps)
 
 
-def build_performance_data(cfg: BenchmarkConfig, sim: SimulationData) -> dict:
-    """Build performance CSV data"""
-    tags, infosteps = read_infostep(cfg, sim)
+def build_performance_data(cfg: DataConfig, sim: SimulationData) -> dict:
+    """Build regular and detailed performance-series records.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+
+    Returns
+    -------
+    dict[str, list[str]]
+        Regular and detailed performance CSV rows keyed by ``series`` and
+        ``detailed``.
+    """
+    tags, infosteps = read_infostep_data(cfg, sim)
     infotimes = infosteps[:, tags.index("Time(day)")] * 86400.0 - sim.timeini
     times_data = np.linspace(0, sim.times[-1], round(sim.times[-1] / cfg.sparset) + 1)
     time_offset = max(0, sim.noskiprst - 1)
@@ -308,7 +443,21 @@ def build_performance_data(cfg: BenchmarkConfig, sim: SimulationData) -> dict:
 
 
 def extract_solver_metrics(infosteps: NDArray, tags: list) -> dict:
-    """Extract solver metrics"""
+    """Extract solver metrics from INFOSTEP columns.
+
+    Parameters
+    ----------
+    infosteps : NDArray
+        Numeric INFOSTEP records.
+    tags : list
+        INFOSTEP column names.
+
+    Returns
+    -------
+    dict[str, NDArray]
+        Convergence flags, iteration counts, time-step sizes, and solver times
+        extracted from the INFOSTEP columns.
+    """
     return {
         "fsteps": np.array(infosteps[:, tags.index("Conv")] == 0, dtype=float),
         "nres": infosteps[:, tags.index("Lins")],
@@ -322,9 +471,28 @@ def extract_solver_metrics(infosteps: NDArray, tags: list) -> dict:
 
 
 def compute_cpu_times(
-    cfg: BenchmarkConfig, sim: SimulationData, times_det: NDArray
+    cfg: DataConfig, sim: SimulationData, times_det: NDArray
 ) -> tuple[list, NDArray, NDArray]:
-    """Compute CPU times"""
+    """Align CPU-time increments with performance output intervals.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    times_det : NDArray
+        Detailed output times.
+
+    Returns
+    -------
+    cpu_times : NDArray
+        CPU-time increments for the detailed output intervals.
+    map_summary : NDArray
+        Sparse-output interval associated with each detailed interval.
+    summary_times : NDArray
+        Summary-vector times relative to the simulation start.
+    """
     cpu = sim.smspec["TCPU"]
     summary_times = 86400.0 * sim.smspec["TIME"] - sim.timeini
     map_summary = np.array(
@@ -362,7 +530,30 @@ def build_time_series(
     interp_fgmip: interp1d,
     cpu: list,
 ) -> list:
-    """Build time series rows"""
+    """Build regular performance time-series rows.
+
+    Parameters
+    ----------
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    times_data : NDArray
+        Requested output times.
+    metrics : dict
+        Extracted solver metrics.
+    map_info : NDArray
+        Mapping from INFOSTEP rows to output intervals.
+    map_summary : NDArray
+        Mapping from detailed intervals to summary records.
+    interp_fgmip : interp1d
+        Interpolated field gas mass in place.
+    cpu : list
+        CPU-time increments.
+
+    Returns
+    -------
+    list[str]
+        Header and rows for the regularly sampled performance CSV file.
+    """
     header = (
         "# t [s], tstep [s], fsteps [-], mass [kg], dof [-], "
         + "nliter [-], nres [-], liniter [-], runtime [s], tlinsol [s]"
@@ -462,7 +653,28 @@ def build_detailed_series(
     interp_fgmip: interp1d,
     cpu: list,
 ) -> list:
-    """Build detailed time series rows"""
+    """Build detailed performance time-series rows.
+
+    Parameters
+    ----------
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    metrics : dict
+        Extracted solver metrics.
+    detail_info : NDArray
+        Detail info.
+    infotimes : NDArray
+        Infotimes.
+    interp_fgmip : interp1d
+        Interpolated field gas mass in place.
+    cpu : list
+        CPU-time increments.
+
+    Returns
+    -------
+    list[str]
+        Header and rows for the detailed performance CSV file.
+    """
     header = (
         "# t [s], tstep [s], fsteps [-], mass [kg], dof [-], nliter [-], "
         + "nres [-], liniter [-], runtime [s], tlinsol [s]"
@@ -483,8 +695,16 @@ def build_detailed_series(
     return rows
 
 
-def write_performance_csv(cfg: BenchmarkConfig, perf: dict) -> None:
-    """Write performance CSV files"""
+def write_performance_csv(cfg: DataConfig, perf: dict) -> None:
+    """Write regular and detailed performance CSV files.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    perf : dict
+        Perf.
+    """
     with open(
         f"{cfg.where}/{cfg.case}_performance_time_series.csv", "w", encoding="utf8"
     ) as file:
@@ -497,14 +717,35 @@ def write_performance_csv(cfg: BenchmarkConfig, perf: dict) -> None:
         file.write("\n".join(perf["detailed"]))
 
 
-def sparse_data(cfg: BenchmarkConfig, sim: SimulationData) -> None:
-    """Generate sparse benchmark data"""
+def generate_sparse_data(cfg: DataConfig, sim: SimulationData) -> None:
+    """Generate sparse benchmark time-series data.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    """
     sparse = build_sparse_data(cfg, sim)
     write_sparse_csv(cfg, sparse)
 
 
-def build_sparse_data(cfg: BenchmarkConfig, sim: SimulationData) -> dict:
-    """Build sparse benchmark data"""
+def build_sparse_data(cfg: DataConfig, sim: SimulationData) -> dict:
+    """Build and interpolate sparse benchmark quantities.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+
+    Returns
+    -------
+    dict[str, NDArray]
+        Sparse benchmark quantities interpolated to the requested output times.
+    """
     times_data = np.linspace(0, sim.times[-1], round(sim.times[-1] / cfg.sparset) + 1)
     fipnum = list(sim.init["FIPNUM"])
     dx = np.array(sim.init["DX"])
@@ -513,16 +754,27 @@ def build_sparse_data(cfg: BenchmarkConfig, sim: SimulationData) -> dict:
     fip_groups = get_fip_groups(cfg)
     summary_data = build_summary_data(cfg, sim, fipnum, fip_groups)
     m_c = (
-        compute_m_c(cfg, sim, fipnum, dx, dy, dz)
+        compute_mixing_measure(cfg, sim, fipnum, dx, dy, dz)
         if not sim.immiscible
         else [0.0] * (sim.norst - sim.noskiprst - 1)
     )
-    interpolated = interpolate_sparse(times_data, sim, summary_data, m_c)
+    interpolated = interpolate_sparse_data(times_data, sim, summary_data, m_c)
     return interpolated
 
 
-def get_fip_groups(cfg: BenchmarkConfig) -> dict:
-    """Define FIP groups"""
+def get_fip_groups(cfg: DataConfig) -> dict:
+    """Return FIPNUM groups used by sparse benchmark quantities.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+
+    Returns
+    -------
+    dict[str, list[int]]
+        FIPNUM values contributing to dissolved, sealing, and boundary quantities.
+    """
     if cfg.lower:
         result = {
             "diss_a": [2, 4, 8],
@@ -554,9 +806,27 @@ def get_fip_groups(cfg: BenchmarkConfig) -> dict:
 
 
 def build_summary_data(
-    cfg: BenchmarkConfig, sim: SimulationData, fipnum: list, groups: dict
+    cfg: DataConfig, sim: SimulationData, fipnum: list, groups: dict
 ) -> dict:
-    """Build sparse summary time series"""
+    """Build sparse quantities from OPM summary vectors.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    fipnum : list
+        FIPNUM values in global cell order.
+    groups : dict
+        FIPNUM groups for sparse benchmark quantities.
+
+    Returns
+    -------
+    dict[str, NDArray]
+        Sensor pressures and mobile, immobile, dissolved, sealing, and boundary
+        mass series.
+    """
     zero_series = 0.0 * sim.smspec["TIME"]
     pop1, pop2 = extract_boundary_pressures(cfg, sim, fipnum)
     result = {
@@ -606,9 +876,24 @@ def build_summary_data(
 
 
 def extract_boundary_pressures(
-    cfg: BenchmarkConfig, sim: SimulationData, fipnum: list
+    cfg: DataConfig, sim: SimulationData, fipnum: list
 ) -> tuple[list, list]:
-    """Extract boundary pressures"""
+    """Extract initial and summary pressure series at both sensors.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    fipnum : list
+        FIPNUM values in global cell order.
+
+    Returns
+    -------
+    pop1, pop2 : list[float]
+        Pressure series at the first and second benchmark sensors, in pascals.
+    """
     pressure = sim.unrst["PRESSURE", 0]
     pcgw = sim.unrst["PCGW", 0]
     index_pop1 = fipnum.index(8)
@@ -626,45 +911,114 @@ def extract_boundary_pressures(
     return pop1, pop2
 
 
-def compute_m_c(
-    cfg: BenchmarkConfig,
+def compute_mixing_measure(
+    cfg: DataConfig,
     sim: SimulationData,
     fipnum: list,
     dx: NDArray,
     dy: NDArray,
     dz: NDArray,
 ) -> list:
-    """Compute Box C variation"""
+    """Calculate the Box C mixing measure for each restart step.
+
+    Concentration differences are evaluated between Box C cells and valid
+    neighboring cells without wrapping across grid boundaries.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized benchmark-data configuration.
+    sim : SimulationData
+        Loaded simulation readers and grid dimensions.
+    fipnum : list
+        FIPNUM values in global cell order.
+    dx, dy, dz : np.ndarray
+        Cell dimensions in the same order as ``fipnum``.
+
+    Returns
+    -------
+    list[float]
+        Mixing-measure values for the selected restart steps.
+
+    """
+    nx, ny, _ = sim.simdim
     box_mask = np.isin(fipnum, (4, 12, 17, 18))
-    box_x = np.roll(box_mask, 1)
-    box_y = np.roll(box_mask, -sim.simdim[0])
-    box_z = np.roll(box_mask, -sim.simdim[0] * sim.simdim[1])
-    den_ratio = WAT_DEN_REF / GAS_DEN_REF
-    dx_b = dx[box_mask]
-    dy_b = dy[box_mask]
-    dz_b = dz[box_mask]
+    box_indices = np.flatnonzero(box_mask)
+
+    i_indices = box_indices % nx
+    j_indices = (box_indices // nx) % ny
+    k_indices = box_indices // (nx * ny)
+
+    has_x_neighbor = i_indices < nx - 1
+    has_y_neighbor = j_indices > 0
+    has_z_neighbor = k_indices > 0
+
+    x_cells = box_indices[has_x_neighbor]
+    y_cells = box_indices[has_y_neighbor]
+    z_cells = box_indices[has_z_neighbor]
+
+    x_neighbors = x_cells + 1
+    y_neighbors = y_cells - nx
+    z_neighbors = z_cells - nx * ny
+
+    dx_box = dx[box_indices]
+    dy_box = dy[box_indices]
+    dz_box = dz[box_indices]
+
+    density_ratio = WAT_DEN_REF / GAS_DEN_REF
     values = []
+
     for step in range(sim.noskiprst + 1, sim.norst):
-        rss = np.array(sim.unrst["RSW", step])
-        max_sat = np.array(sim.unrst["RSWSAT", step])
-        xcw = rss / (rss + den_ratio)
-        xcw /= max_sat / (max_sat + den_ratio)
-        dxv = np.abs(xcw[box_x] - xcw[box_mask])
-        dzv = np.abs(xcw[box_z] - xcw[box_mask])
+        dissolved_ratio = np.asarray(sim.unrst["RSW", step])
+        saturated_ratio = np.asarray(sim.unrst["RSWSAT", step])
+
+        concentration = dissolved_ratio / (dissolved_ratio + density_ratio)
+        concentration /= saturated_ratio / (saturated_ratio + density_ratio)
+
+        x_variation = np.abs(concentration[x_neighbors] - concentration[x_cells])
+        z_variation = np.abs(concentration[z_neighbors] - concentration[z_cells])
+
         if cfg.case != "spe11c":
-            values.append(np.sum(dxv * dz_b + dzv * dx_b))
+            mixing_measure = np.sum(x_variation * dz_box[has_x_neighbor])
+            mixing_measure += np.sum(z_variation * dx_box[has_z_neighbor])
         else:
-            dyv = np.abs(xcw[box_y] - xcw[box_mask])
-            values.append(
-                np.sum(dxv * dy_b * dz_b + dyv * dx_b * dz_b + dzv * dx_b * dy_b)
+            y_variation = np.abs(concentration[y_neighbors] - concentration[y_cells])
+            mixing_measure = np.sum(
+                x_variation * dy_box[has_x_neighbor] * dz_box[has_x_neighbor]
             )
+            mixing_measure += np.sum(
+                y_variation * dx_box[has_y_neighbor] * dz_box[has_y_neighbor]
+            )
+            mixing_measure += np.sum(
+                z_variation * dx_box[has_z_neighbor] * dy_box[has_z_neighbor]
+            )
+
+        values.append(float(mixing_measure))
+
     return values
 
 
-def interpolate_sparse(
+def interpolate_sparse_data(
     times_data: NDArray, sim: SimulationData, summary: dict, m_c: list
 ) -> dict:
-    """Interpolate sparse outputs"""
+    """Interpolate sparse quantities to the requested output times.
+
+    Parameters
+    ----------
+    times_data : NDArray
+        Requested output times.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    summary : dict
+        Sparse summary quantities.
+    m_c : list
+        Mixing-measure values at restart times.
+
+    Returns
+    -------
+    dict[str, NDArray]
+        Sparse quantities and output times evaluated on the requested time grid.
+    """
     result = {}
     tsim = sim.timesumary
     tlen = len(tsim)
@@ -683,8 +1037,16 @@ def interpolate_sparse(
     return result
 
 
-def write_sparse_csv(cfg: BenchmarkConfig, sparse: dict) -> None:
-    """Write sparse CSV"""
+def write_sparse_csv(cfg: DataConfig, sparse: dict) -> None:
+    """Write the sparse benchmark time-series CSV file.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sparse : dict
+        Sparse.
+    """
     header = (
         "# t [s], p1 [Pa], p2 [Pa], mobA [kg], immA [kg], dissA [kg], sealA [kg], "
         + "mobB [kg], immB [kg], dissB [kg], sealB [kg], MC [m], sealTot [kg]"
@@ -727,26 +1089,67 @@ def write_sparse_csv(cfg: BenchmarkConfig, sparse: dict) -> None:
             )
 
 
-def dense_data(cfg: BenchmarkConfig, sim: SimulationData) -> None:
-    """Generate dense benchmark data"""
-    rstno, nrstno, refgrid, mapping, actindr = build_dense_static(cfg, sim)
+def generate_dense_data(cfg: DataConfig, sim: SimulationData) -> list[str]:
+    """Generate dense and performance-spatial benchmark files.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+
+    Returns
+    -------
+    list[str]
+        Names of the generated dense and performance-spatial CSV files.
+    """
+    files = []
+    rstno, refgrid, mapping, actindr = prepare_dense_mapping(cfg, sim)
     if cfg.mode == "all" or cfg.mode[:5] == "dense":
-        for step_index, restart in enumerate(rstno):
-            if step_index + 1 < nrstno:
-                print(f"Processing dense data {step_index+1} out of {nrstno}", end="\r")
-            else:
-                print(f"Processing dense data {step_index+1} out of {nrstno}")
-            restart_index = restart + sim.noskiprst
-            dense_step = build_dense_step(cfg, sim, mapping, restart_index, actindr)
-            write_dense_csv(cfg, sim, refgrid, dense_step, step_index)
+        show_progress = sys.stdout.isatty()
+        if show_progress:
+            bar_ctx = alive_bar(len(rstno), bar="fish")
+        else:
+            bar_ctx = nullcontext()
+        pyopmspe11_info("processing dense data")
+        with bar_ctx as bar_animation:
+            for step_index, restart in enumerate(rstno):
+                if show_progress:
+                    bar_animation()
+                restart_index = restart + sim.noskiprst
+                dense_step = build_dense_step(cfg, sim, mapping, restart_index, actindr)
+                files.append(write_dense_csv(cfg, sim, refgrid, dense_step, step_index))
     if cfg.mode in ("all", "performance-spatial", "dense_performance-spatial"):
-        handle_performance_spatial(cfg, sim, rstno, refgrid, mapping, actindr)
+        files.extend(
+            generate_performance_spatial_data(
+                cfg, sim, rstno, refgrid, mapping, actindr
+            )
+        )
+    return files
 
 
-def can_use_fast_dense_mapping(
-    cfg: BenchmarkConfig, sim: SimulationData, dx: NDArray, dz: NDArray
+def supports_fast_dense_mapping(
+    cfg: DataConfig, sim: SimulationData, dx: NDArray, dz: NDArray
 ) -> bool:
-    """Check if fast dense mapping can be used"""
+    """Return whether aligned grids support direct dense mapping.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    dx : NDArray
+        Cell sizes along x.
+    dz : NDArray
+        Cell sizes along z.
+
+    Returns
+    -------
+    bool
+        Whether the requested condition is satisfied.
+    """
     if cfg.lower:
         return False
     if np.min(dz) != np.max(dz):
@@ -763,12 +1166,31 @@ def can_use_fast_dense_mapping(
 
 
 def build_general_dense_mapping(
-    cfg: BenchmarkConfig,
+    cfg: DataConfig,
     sim: SimulationData,
     refgrid: tuple[NDArray, NDArray, NDArray, NDArray, NDArray, NDArray],
     geometry: tuple[NDArray, NDArray, list],
 ) -> tuple[list[list[list[int | float]]], NDArray]:
-    """General sim-to-report mapping using geometry"""
+    """Map simulation cells to reporting cells by polygon intersection.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    refgrid : tuple[NDArray, NDArray, NDArray, NDArray, NDArray, NDArray]
+        Reporting-grid vertices and centers.
+    geometry : tuple[NDArray, NDArray, list]
+        Simulation centers and cell polygons.
+
+    Returns
+    -------
+    cell_ind : list[list[list[int | float]]]
+        Reporting-cell indices and overlap weights for each simulation cell.
+    cell_cent : NDArray
+        Representative simulation-cell index for each reporting cell.
+    """
     refxvert, _, refzvert, refxcent, _, refzcent = refgrid
     simxcent, simzcent, simpoly = geometry
     cell_ind: list[list[list[int | float]]] = [[] for _ in range(sim.nocellsxz)]
@@ -792,7 +1214,9 @@ def build_general_dense_mapping(
             refpoly[rid] = poly
             idx.insert(rid, poly.bounds)
             rid += 1
-    print("Processing polygon intersections between simulation and reporting grids")
+    pyopmspe11_info(
+        "processing polygon intersections between simulation and reporting grids"
+    )
     show_progress = sys.stdout.isatty()
     if show_progress:
         bar_ctx = alive_bar(len(simpoly), bar="fish")
@@ -810,7 +1234,7 @@ def build_general_dense_mapping(
                         cell_ind[sim_cell].append([tgt, a / area_s])
             else:
                 cell_ind[sim_cell] = cell_ind[sim_cell - 1]
-    print("Finding the cell indices between simulation and reporting grids")
+    pyopmspe11_info("finding the cell indices between simulation and reporting grids")
     show_progress = sys.stdout.isatty()
     if show_progress:
         bar_ctx = alive_bar(len(refxgrid), bar="fish")
@@ -824,41 +1248,115 @@ def build_general_dense_mapping(
     return cell_ind, cell_cent
 
 
-def build_dense_static(cfg: BenchmarkConfig, sim: SimulationData) -> tuple[
+def prepare_dense_mapping(cfg: DataConfig, sim: SimulationData) -> tuple[
     list,
-    int,
     tuple[NDArray, NDArray, NDArray, NDArray, NDArray, NDArray],
     tuple[list[list[list[int | float]]], NDArray],
     NDArray,
 ]:
-    """Build static dense grid data"""
-    rstno, nrstno = build_dense_schedule(cfg, sim)
+    """Prepare static geometry and the simulation-to-report mapping.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+
+    Returns
+    -------
+    rstno : list[int]
+        Restart indices selected for dense output.
+    refgrid : tuple[NDArray, NDArray, NDArray, NDArray, NDArray, NDArray]
+        Reporting-grid vertices and centers along x, y, and z.
+    mapping : tuple[list[list[list[int | float]]], NDArray]
+        Weighted cell mapping and representative simulation cells.
+    actindr : NDArray
+        Indices of inactive reporting-grid cells.
+    """
+    rstno = select_dense_restart_steps(cfg, sim)
     refgrid = build_dense_reference_grid(cfg)
-    simxcent, simycent, simzcent, simpoly, satnum = extract_sim_geometry(cfg, sim)
+    simxcent, simycent, simzcent, simpoly, satnum = extract_simulation_geometry(
+        cfg, sim
+    )
     dx = np.array(sim.init["DX"])
     dz = np.array(sim.init["DZ"])
-    if can_use_fast_dense_mapping(cfg, sim, dx, dz):
+    if supports_fast_dense_mapping(cfg, sim, dx, dz):
         cell_ind, cell_cent = build_fast_dense_mapping(cfg, sim, dx, dz)
     else:
         cell_ind, cell_cent = build_general_dense_mapping(
             cfg, sim, refgrid, (simxcent, simzcent, simpoly)
         )
-    cell_ind, cell_cent, actindr = handle_post_mapping(
+    cell_ind, cell_cent, actindr = finalize_dense_mapping(
         cfg, sim, refgrid, (cell_ind, cell_cent), simycent, satnum
     )
-    return rstno, nrstno, refgrid, (cell_ind, cell_cent), actindr
+    return rstno, refgrid, (cell_ind, cell_cent), actindr
 
 
-def build_dense_schedule(cfg: BenchmarkConfig, sim: SimulationData) -> tuple[list, int]:
-    """Compute restart indices for dense output"""
-    rstno = [sim.times.index(time_val) for time_val in cfg.denset]
-    return rstno, len(rstno)
+def select_dense_restart_steps(cfg: DataConfig, sim: SimulationData) -> list[int]:
+    """Select restart indices for requested dense output times.
+
+    Each requested time must match an available restart time within floating-
+    point precision.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized benchmark-data configuration.
+    sim : SimulationData
+        Loaded readers and timing data.
+
+    Returns
+    -------
+    list[int]
+        Restart indices corresponding to the requested dense output times.
+
+    Raises
+    ------
+    ValueError
+        If a requested time does not match an available restart time.
+
+    """
+    simulation_times = np.asarray(sim.times, dtype=float)
+    requested_times = np.atleast_1d(cfg.denset)
+    max_time = np.max(np.abs(simulation_times))
+    tolerance = max(1e-6, 10 * np.spacing(max_time))
+    restart_indices = []
+
+    for requested_time in requested_times:
+        restart_index = int(np.argmin(np.abs(simulation_times - requested_time)))
+        if not np.isclose(
+            simulation_times[restart_index],
+            requested_time,
+            rtol=0.0,
+            atol=tolerance,
+        ):
+            pyopmspe11_error(
+                f"requested dense output time {requested_time} s does not "
+                "match an available restart time"
+            )
+        restart_indices.append(restart_index)
+
+    return restart_indices
 
 
 def build_dense_reference_grid(
-    cfg: BenchmarkConfig,
+    cfg: DataConfig,
 ) -> tuple[NDArray, NDArray, NDArray, NDArray, NDArray, NDArray]:
-    """Build reporting grid coordinates"""
+    """Build reporting-grid vertices and centers.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+
+    Returns
+    -------
+    refxvert, refyvert, refzvert : NDArray
+        Reporting-grid vertices along x, y, and z.
+    refxcent, refycent, refzcent : NDArray
+        Reporting-grid cell centers along x, y, and z.
+    """
     refxvert = np.linspace(0, cfg.dims[0], cfg.nxyz[0] + 1)
     refyvert = np.linspace(0, cfg.dims[1], cfg.nxyz[1] + 1)
     refzvert = np.linspace(0, cfg.dims[2], cfg.nxyz[2] + 1)
@@ -868,10 +1366,27 @@ def build_dense_reference_grid(
     return refxvert, refyvert, refzvert, refxcent, refycent, refzcent
 
 
-def extract_sim_geometry(
-    cfg: BenchmarkConfig, sim: SimulationData
+def extract_simulation_geometry(
+    cfg: DataConfig, sim: SimulationData
 ) -> tuple[NDArray, NDArray, NDArray, list, NDArray]:
-    """Extract simulation geometry"""
+    """Extract simulation centers, polygons, and SATNUM values.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+
+    Returns
+    -------
+    simxcent, simycent, simzcent : NDArray
+        Simulation-cell centers along x, y, and z.
+    simpoly : list[Polygon]
+        Simulation-cell polygons in the x-z plane.
+    satnum : NDArray
+        Saturation-region identifiers in global cell order.
+    """
     simxcent = np.zeros(sim.nocellsxz)
     simzcent = np.zeros(sim.nocellsxz)
     simycent = np.zeros(sim.simdim[1])
@@ -907,9 +1422,28 @@ def extract_sim_geometry(
 
 
 def build_fast_dense_mapping(
-    cfg: BenchmarkConfig, sim: SimulationData, dx: NDArray, dz: NDArray
+    cfg: DataConfig, sim: SimulationData, dx: NDArray, dz: NDArray
 ) -> tuple[list[list[list[int | float]]], NDArray]:
-    """Fast sim-to-report mapping for aligned grids"""
+    """Build a direct mapping for aligned simulation and reporting grids.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    dx : NDArray
+        Cell sizes along x.
+    dz : NDArray
+        Cell sizes along z.
+
+    Returns
+    -------
+    cell_ind : list[list[list[int | float]]]
+        Reporting-cell indices and overlap weights for each simulation cell.
+    cell_cent : NDArray
+        Representative simulation-cell index for each reporting cell.
+    """
     cell_ind: list[list[list[int | float]]] = [[] for _ in range(sim.nocellsxz)]
     cell_indc = np.zeros(sim.nocellsxz, dtype=int)
     cell_cent = np.zeros(cfg.nocellsrepgrid, dtype=float)
@@ -1028,19 +1562,44 @@ def build_fast_dense_mapping(
     return cell_ind, cell_cent
 
 
-def handle_post_mapping(
-    cfg: BenchmarkConfig,
+def finalize_dense_mapping(
+    cfg: DataConfig,
     sim: SimulationData,
     refgrid: tuple[NDArray, NDArray, NDArray, NDArray, NDArray, NDArray],
     mapping: tuple[list[list[list[int | float]]], NDArray],
     simycent: NDArray,
     satnum: NDArray,
 ) -> tuple[list[list[list[int | float]]], NDArray, NDArray]:
-    """Post-process mapping"""
+    """Apply inactive-cell and SPE11C y-axis mapping adjustments.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    refgrid : tuple[NDArray, NDArray, NDArray, NDArray, NDArray, NDArray]
+        Reporting-grid vertices and centers.
+    mapping : tuple[list[list[list[int | float]]], NDArray]
+        Simulation-to-report mapping and representative cells.
+    simycent : NDArray
+        Simulation-cell centers along y.
+    satnum : NDArray
+        SATNUM values in global cell order.
+
+    Returns
+    -------
+    cell_ind : list[list[list[int | float]]]
+        Final extensive-quantity mapping for all simulation cells.
+    cell_cent : NDArray
+        Final representative simulation cells for intensive quantities.
+    actindr : NDArray
+        Indices of inactive reporting-grid cells.
+    """
     cell_ind, cell_cent = mapping
     actindr = np.empty(0)
     if np.max(satnum) < 7 and cfg.case == "spe11a":
-        actindr = handle_inactive_mapping(cfg, sim, cell_ind)
+        actindr = find_inactive_report_cells(cfg, sim, cell_ind)
     if cfg.case == "spe11c":
         cell_cent = handle_yaxis_mapping_intensive(
             cfg, sim, cell_cent, refgrid[4], simycent
@@ -1052,29 +1611,67 @@ def handle_post_mapping(
 
 
 def build_dense_step(
-    cfg: BenchmarkConfig,
+    cfg: DataConfig,
     sim: SimulationData,
     mapping: tuple[list[list[list[int | float]]], NDArray],
     restart_index: int,
     actindr: NDArray,
 ) -> dict:
-    """Build dense data for one restart"""
-    names = ["pressure", "sgas", "xco2", "xh20", "gden", "wden", "tco2"]
+    """Build all dense quantities for one restart step.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    mapping : tuple[list[list[list[int | float]]], NDArray]
+        Simulation-to-report mapping and representative cells.
+    restart_index : int
+        Restart report-step index.
+    actindr : NDArray
+        Inactive reporting-cell indices.
+
+    Returns
+    -------
+    dict[str, NDArray]
+        Simulation-grid and reporting-grid arrays for all dense quantities.
+    """
+    names = ["pressure", "sgas", "xco2", "xh2o", "gden", "wden", "tco2"]
     if not sim.isothermal:
         names = ["temp"] + names
     arrays = generate_arrays(cfg, sim, names, restart_index, actindr)
-    map_to_report_grid(sim, mapping, arrays)
+    map_dense_arrays_to_report_grid(sim, mapping, arrays)
     return arrays
 
 
 def write_dense_csv(
-    cfg: BenchmarkConfig,
+    cfg: DataConfig,
     sim: SimulationData,
     refgrid: tuple[NDArray, NDArray, NDArray, NDArray, NDArray, NDArray],
     dense_step: dict,
     step_index: int,
-) -> None:
-    """Write dense spatial CSV"""
+) -> str:
+    """Write one dense spatial benchmark CSV file.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    refgrid : tuple[NDArray, NDArray, NDArray, NDArray, NDArray, NDArray]
+        Reporting-grid vertices and centers.
+    dense_step : dict
+        Dense step.
+    step_index : int
+        Selected dense output index.
+
+    Returns
+    -------
+    str
+        Generated filename or formatted text.
+    """
     name_t, text = get_header(cfg, sim, step_index)
     if cfg.lower:
         dense_step["tco2_refg"][np.isnan(dense_step["sgas_refg"])] = np.nan
@@ -1083,11 +1680,12 @@ def write_dense_csv(
     p_arr = dense_step["pressure_refg"]
     s_arr = dense_step["sgas_refg"]
     xco2_arr = dense_step["xco2_refg"]
-    xh20_arr = dense_step["xh20_refg"]
+    xh2o_arr = dense_step["xh2o_refg"]
     gden_arr = dense_step["gden_refg"]
     wden_arr = dense_step["wden_refg"]
     tco2_arr = dense_step["tco2_refg"]
     temp_arr = dense_step.get("temp_refg")
+    file_name = f"{cfg.case}_spatial_map_{name_t}.csv"
     path = f"{cfg.where}/{cfg.case}_spatial_map_{name_t}.csv"
     with open(path, "w", encoding="utf8") as file:
         file.write("\n".join(text))
@@ -1125,7 +1723,7 @@ def write_dense_csv(
                             xf = hf = "n/a"
                         else:
                             xf = f"{xco2_arr[cell]:.3e}"
-                            hf = f"{xh20_arr[cell]:.3e}"
+                            hf = f"{xh2o_arr[cell]:.3e}"
                         tf = f"{temp_arr[cell]:.3e}" if temp_arr is not None else None
                         if cfg.case == "spe11a":
                             row = (
@@ -1144,16 +1742,36 @@ def write_dense_csv(
                             )
                     file.write("\n" + row)
                     idxy += 1
+    return file_name
 
 
 def handle_yaxis_mapping_extensive(
-    cfg: BenchmarkConfig,
+    cfg: DataConfig,
     sim: SimulationData,
     cell_ind: list[list[list[int | float]]],
     simycent: NDArray,
     refyvert: NDArray,
 ) -> list[list[list[int | float]]]:
-    """Extend indices for y direction (extensive)"""
+    """Extend indices for y direction (extensive).
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    cell_ind : list[list[list[int | float]]]
+        Weighted simulation-to-report cell mapping.
+    simycent : NDArray
+        Simulation-cell centers along y.
+    refyvert : NDArray
+        Reporting-grid vertices along y.
+
+    Returns
+    -------
+    list[list[list[int | float]]]
+        Mapping expanded across the SPE11C y direction with overlap weights.
+    """
     simyvert = [0.0]
     for yval in simycent:
         simyvert.append(simyvert[-1] + 2.0 * (yval - simyvert[-1]))
@@ -1196,13 +1814,32 @@ def handle_yaxis_mapping_extensive(
 
 
 def handle_yaxis_mapping_intensive(
-    cfg: BenchmarkConfig,
+    cfg: DataConfig,
     sim: SimulationData,
     cell_cent: NDArray,
     refycent: NDArray,
     simycent: NDArray,
 ) -> NDArray:
-    """Extend representative cell indices for y direction (intensive)"""
+    """Extend representative cell indices for y direction (intensive).
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    cell_cent : NDArray
+        Representative simulation cell for each reporting cell.
+    refycent : NDArray
+        Reporting-grid centers along y.
+    simycent : NDArray
+        Simulation-cell centers along y.
+
+    Returns
+    -------
+    NDArray
+        Calculated numeric values.
+    """
     indy = np.array([np.argmin(np.abs(simycent - y)) for y in refycent])
     expanded = np.zeros(cfg.nocellsrepgrid, dtype=int)
     nx, ny, nz = cfg.nxyz
@@ -1220,10 +1857,25 @@ def handle_yaxis_mapping_intensive(
     return expanded
 
 
-def handle_inactive_mapping(
-    cfg: BenchmarkConfig, sim: SimulationData, cell_ind: list[list[list[int | float]]]
+def find_inactive_report_cells(
+    cfg: DataConfig, sim: SimulationData, cell_ind: list[list[list[int | float]]]
 ) -> NDArray:
-    """Identify inactive reporting-grid cells"""
+    """Find reporting cells not covered by active simulation cells.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    cell_ind : list[list[list[int | float]]]
+        Weighted simulation-to-report cell mapping.
+
+    Returns
+    -------
+    NDArray
+        Calculated numeric values.
+    """
     actindr = []
     for i in sim.actind:
         for mask in cell_ind[i]:
@@ -1233,47 +1885,74 @@ def handle_inactive_mapping(
     return np.delete(allc, actindr)
 
 
-def handle_performance_spatial(
-    cfg: BenchmarkConfig,
+def generate_performance_spatial_data(
+    cfg: DataConfig,
     sim: SimulationData,
     rstno: list,
     refgrid: tuple[NDArray, NDArray, NDArray, NDArray, NDArray, NDArray],
     mapping: tuple[list, NDArray],
     actindr: NDArray,
-) -> None:
-    """Create performance spatial maps"""
+) -> list[str]:
+    """Generate performance-spatial benchmark CSV files.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    rstno : list
+        Selected restart indices.
+    refgrid : tuple[NDArray, NDArray, NDArray, NDArray, NDArray, NDArray]
+        Reporting-grid vertices and centers.
+    mapping : tuple[list, NDArray]
+        Simulation-to-report mapping and representative cells.
+    actindr : NDArray
+        Inactive reporting-cell indices.
+
+    Returns
+    -------
+    list[str]
+        Names of the generated performance-spatial CSV files.
+    """
+    files = []
     cell_ind, _ = mapping
     _, _, _, refxcent, refycent, refzcent = refgrid
     counter = 0.0 * np.ones(cfg.nocellsrepgrid)
     pore_volume = 0.0 * np.ones(cfg.nocellsrepgrid)
     if actindr.size > 0:
         pore_volume[actindr] = 1.0
-    latest_dts, cvol_refg, arat_refg, valid = static_map_performance_spatial(
+    latest_dts, cvol_refg, arat_refg, valid = map_static_performance_properties(
         cfg, sim, cell_ind, counter, pore_volume
     )
     names = ("co2mn", "h2omn", "co2mb", "h2omb")
-    for i, rst in enumerate(rstno):
-        if i + 1 < len(rstno):
-            print(
-                f"Processing performance spatial {i+1} out of {len(rstno)}",
-                end="\r",
+    show_progress = sys.stdout.isatty()
+    if show_progress:
+        bar_ctx = alive_bar(len(rstno), bar="fish")
+    else:
+        bar_ctx = nullcontext()
+    pyopmspe11_info("processing performance spatial data")
+    with bar_ctx as bar_animation:
+        for i, rst in enumerate(rstno):
+            if show_progress:
+                bar_animation()
+            arrays = initialize_performance_arrays(sim, names)
+            step_index = rst + sim.noskiprst
+            if step_index > 0:
+                populate_performance_arrays(sim, arrays, step_index - 1)
+            refg = map_performance_to_report_grid(
+                cfg, sim, arrays, cell_ind, latest_dts[i], pore_volume, valid
             )
-        else:
-            print(f"Processing performance spatial {i+1} out of {len(rstno)}")
-        arrays = init_performance_arrays(sim, names)
-        step_index = rst + sim.noskiprst
-        if step_index > 0:
-            populate_performance_arrays(sim, arrays, step_index - 1)
-        refg = map_performance_to_report_grid(
-            cfg, sim, arrays, cell_ind, latest_dts[i], pore_volume, valid
-        )
-        write_dense_performance_spatial(
-            cfg, refg, cvol_refg, arat_refg, refxcent, refycent, refzcent, i
-        )
+            files.append(
+                write_dense_performance_spatial(
+                    cfg, refg, cvol_refg, arat_refg, refxcent, refycent, refzcent, i
+                )
+            )
+    return files
 
 
 def map_performance_to_report_grid(
-    cfg: BenchmarkConfig,
+    cfg: DataConfig,
     sim: SimulationData,
     arrays: dict,
     cell_ind: list,
@@ -1281,7 +1960,30 @@ def map_performance_to_report_grid(
     pore_volume: NDArray,
     valid: NDArray,
 ) -> dict:
-    """Map simulation grid to reporting grid"""
+    """Map residual and mass-balance metrics to the reporting grid.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    arrays : dict
+        Simulation-grid quantity arrays.
+    cell_ind : list
+        Weighted simulation-to-report cell mapping.
+    delta_t : float
+        Latest accepted time-step length.
+    pore_volume : NDArray
+        Accumulated pore volume per reporting cell.
+    valid : NDArray
+        Mask of reporting cells with positive pore volume.
+
+    Returns
+    -------
+    dict[str, NDArray]
+        Normalized residual and mass-balance quantities on the reporting grid.
+    """
     refg = {
         "co2mn": np.full(cfg.nocellsrepgrid, -np.inf),
         "h2omn": np.full(cfg.nocellsrepgrid, -np.inf),
@@ -1313,14 +2015,39 @@ def map_performance_to_report_grid(
     return refg
 
 
-def static_map_performance_spatial(
-    cfg: BenchmarkConfig,
+def map_static_performance_properties(
+    cfg: DataConfig,
     sim: SimulationData,
     cell_ind: list,
     counter: NDArray,
     pore_volume: NDArray,
 ) -> tuple[list, NDArray, NDArray, NDArray]:
-    """Map static quantities for performance spatial data"""
+    """Map static cell-volume and aspect-ratio metrics.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    cell_ind : list
+        Weighted simulation-to-report cell mapping.
+    counter : NDArray
+        Number of simulation contributions per reporting cell.
+    pore_volume : NDArray
+        Accumulated pore volume per reporting cell.
+
+    Returns
+    -------
+    latest_dts : list[float]
+        Latest accepted time-step size for each dense output time.
+    cvol_refg : NDArray
+        Average simulation-cell volume on the reporting grid.
+    arat_refg : NDArray
+        Average cell aspect ratio on the reporting grid.
+    valid : NDArray
+        Mask of reporting cells with positive mapped pore volume.
+    """
     tmp1, tmp2 = [], []
     with open(
         f"{cfg.flowfol}/{cfg.outfol.split('/')[-1].upper()}.INFOSTEP",
@@ -1367,10 +2094,23 @@ def static_map_performance_spatial(
     return latest_dts, cvol_refg, arat_refg, valid
 
 
-def init_performance_arrays(
+def initialize_performance_arrays(
     sim: SimulationData, names: tuple[str, str, str, str]
 ) -> dict:
-    """Initialize performance arrays"""
+    """Initialize global arrays for performance-spatial quantities.
+
+    Parameters
+    ----------
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    names : tuple[str, str, str, str]
+        Quantity names to initialize or populate.
+
+    Returns
+    -------
+    dict[str, NDArray]
+        Zero-filled global arrays for the requested performance quantities.
+    """
     arrays = {}
     for name in names:
         arrays[f"{name}_array"] = np.zeros(sim.nocellst)
@@ -1380,7 +2120,17 @@ def init_performance_arrays(
 def populate_performance_arrays(
     sim: SimulationData, arrays: dict, step_index: int
 ) -> None:
-    """Populate performance arrays"""
+    """Populate performance arrays from one restart step.
+
+    Parameters
+    ----------
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    arrays : dict
+        Simulation-grid quantity arrays.
+    step_index : int
+        Selected dense output index.
+    """
     act = sim.actind
     co2mb = arrays["co2mb_array"]
     h2omb = arrays["h2omb_array"]
@@ -1397,7 +2147,7 @@ def populate_performance_arrays(
 
 
 def write_dense_performance_spatial(
-    cfg: BenchmarkConfig,
+    cfg: DataConfig,
     refg: dict,
     cvol_refg: NDArray,
     arat_refg: NDArray,
@@ -1405,8 +2155,33 @@ def write_dense_performance_spatial(
     refycent: NDArray,
     refzcent: NDArray,
     i: int,
-) -> None:
-    """Write dense performance spatial CSV"""
+) -> str:
+    """Write one performance-spatial benchmark CSV file.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    refg : dict
+        Performance quantities on the reporting grid.
+    cvol_refg : NDArray
+        Cell-volume metric on the reporting grid.
+    arat_refg : NDArray
+        Aspect-ratio metric on the reporting grid.
+    refxcent : NDArray
+        Reporting-grid centers along x.
+    refycent : NDArray
+        Reporting-grid centers along y.
+    refzcent : NDArray
+        Reporting-grid centers along z.
+    i : int
+        Selected record index.
+
+    Returns
+    -------
+    str
+        Generated filename or formatted text.
+    """
     if cfg.case == "spe11a":
         name_t = f"{round(cfg.denset[i]/3600)}h"
     else:
@@ -1416,7 +2191,8 @@ def write_dense_performance_spatial(
     h2omn = refg["h2omn"]
     co2mb = refg["co2mb"]
     h2omb = refg["h2omb"]
-    path = f"{cfg.where}/{cfg.case}_performance_spatial_map_{name_t}.csv"
+    file_name = f"{cfg.case}_performance_spatial_map_{name_t}.csv"
+    path = f"{cfg.where}/{file_name}"
     with open(path, "w", encoding="utf8") as file:
         if cfg.case != "spe11c":
             file.write(
@@ -1459,16 +2235,36 @@ def write_dense_performance_spatial(
                                 f"{co2mb[idc]:.3e}, {h2omb[idc]:.3e}, n/a"
                             )
                     idxy += 1
+    return file_name
 
 
 def generate_arrays(
-    cfg: BenchmarkConfig,
+    cfg: DataConfig,
     sim: SimulationData,
     names: list,
     restart_index: int,
     actindr: NDArray,
 ) -> dict:
-    """Populate dense arrays for one restart"""
+    """Build simulation and reporting arrays for dense quantities.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    names : list
+        Quantity names to initialize or populate.
+    restart_index : int
+        Restart report-step index.
+    actindr : NDArray
+        Inactive reporting-cell indices.
+
+    Returns
+    -------
+    dict[str, NDArray]
+        Dense quantities in simulation-cell and reporting-grid order.
+    """
     arrays = {}
     act = sim.actind
     porva = sim.porva
@@ -1513,7 +2309,7 @@ def generate_arrays(
     arrays["gden_array"][act] = rhog * mask_g
     arrays["wden_array"][act] = rhow
     arrays["xco2_array"][act] = xco2
-    arrays["xh20_array"][act] = xh2o * mask_g
+    arrays["xh2o_array"][act] = xh2o * mask_g
     tco2_array[act] = co2_d + co2_g
     arrays["tco2_array"] = tco2_array
     arrays["tco2_refg"] = tco2_refg
@@ -1525,12 +2321,22 @@ def generate_arrays(
     return arrays
 
 
-def map_to_report_grid(
+def map_dense_arrays_to_report_grid(
     sim: SimulationData,
     mapping: tuple[list[list[list[int | float]]], NDArray],
     arrays: dict,
 ) -> None:
-    """Map simulation arrays to reporting grid"""
+    """Map intensive and extensive dense quantities to the reporting grid.
+
+    Parameters
+    ----------
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    mapping : tuple[list[list[list[int | float]]], NDArray]
+        Simulation-to-report mapping and representative cells.
+    arrays : dict
+        Simulation-grid quantity arrays.
+    """
     cell_ind, cell_cent = mapping
     tco2_arr = arrays["tco2_array"]
     tco2_refg = arrays["tco2_refg"]
@@ -1545,10 +2351,25 @@ def map_to_report_grid(
                 arrays[key.replace("_array", "_refg")][rep] = arrays[key][cell]
 
 
-def get_header(
-    cfg: BenchmarkConfig, sim: SimulationData, i: int
-) -> tuple[str, list[str]]:
-    """Get the CSV header for spe11x"""
+def get_header(cfg: DataConfig, sim: SimulationData, i: int) -> tuple[str, list[str]]:
+    """Build the dense CSV time label and column header.
+
+    Parameters
+    ----------
+    cfg : DataConfig
+        Initialized runtime configuration.
+    sim : SimulationData
+        Loaded simulation readers and metadata.
+    i : int
+        Selected record index.
+
+    Returns
+    -------
+    name_t : str
+        Time label used in the dense spatial filename.
+    text : list[str]
+        CSV header lines for the selected SPE11 case.
+    """
     if cfg.case == "spe11a":
         name_t = f"{round(cfg.denset[i]/3600)}h"
         text = [
@@ -1575,6 +2396,51 @@ def get_header(
             + "total mass CO2 [kg], temperature [C]"
         ]
     return name_t, text
+
+
+def main(argv: list[str] | None = None) -> None:
+    """Run benchmark-data generation from the command line.
+
+    The function parses standalone data-processing arguments and generates the
+    requested sparse, dense, performance, or performance-spatial CSV files from
+    existing OPM Flow results.
+
+    Parameters
+    ----------
+    argv : list[str], optional
+        Arguments to parse instead of ``sys.argv[1:]``. This is primarily used
+        by tests and programmatic callers.
+
+    """
+    parser = argparse.ArgumentParser(description="Main script to process the data")
+    parser.add_argument("-p", "--path", default="output", help="Output folder")
+    parser.add_argument("-d", "--deck", default="spe11b", help="Simulated case")
+    parser.add_argument("-r", "--resolution", default="10,1,5", help="x,y,z elements")
+    parser.add_argument(
+        "-t",
+        "--time",
+        default="24",
+        help="Dense output time(s): spe11a [h], spe11b/c [y]",
+    )
+    parser.add_argument(
+        "-w",
+        "--write",
+        default="0.1",
+        help="Sparse/performance interval: spe11a [h], spe11b/c [y]",
+    )
+    parser.add_argument(
+        "-g",
+        "--generate",
+        default="sparse",
+        help="dense, sparse, performance, performance-spatial or combinations",
+    )
+    parser.add_argument(
+        "-n", "--neighbourhood", default="", help="Region: 'lower' or all"
+    )
+    parser.add_argument("-f", "--subfolders", default=1, help="Create subfolders")
+    cmdargs = vars(parser.parse_args(argv))
+    generated_files = generate_data(cmdargs)
+    pyopmspe11_success("", cmdargs["path"], generated_files)
 
 
 if __name__ == "__main__":

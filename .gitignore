@@ -173,13 +173,16 @@ dune-*
 opm-*
 
 # Examples outputs
-cssr
-debugging
-developing
-playground
-project
-examples/spe11b
+/cssr
+/debugging
+/developing
+/playground
+/project
+/examples/spe11b
+/my_spe11b
+/my_spe11b.toml
+/my_spe11b_co2m_i,1,k_t5.png
 
 # Tests
-test_outputs
+/test_outputs
 tests/decks/spe11c/r2_cp_50m-50m-8mish/GRID.INC

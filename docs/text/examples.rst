@@ -1,126 +1,39 @@
-********
+.. _examples:
+
 Examples
-********
+========
 
-===========
-Hello world 
-===========
+Select an example to view its commands, figures, and reproducible script.
+OPM Flow is required to run simulation stages; see :ref:`opm-flow-installation`.
 
-The `examples <https://github.com/OPM/pyopmspe11/blob/main/examples>`_ folder contains configuration files
-with low grid resolution and shorter injection times (for initial testing of the framework). For example, by executing:
+.. grid:: 1 1 2 2
+   :gutter: 3
 
-.. code-block:: bash
+   .. grid-item-card:: Hello world
+      :link: example-hello-world
+      :link-type: ref
+      :img-top: figs/spe11b_tco2_2Dmaps.png
 
-    pyopmspe11 -i spe11b.toml -o spe11b -m all -g all -t 5 -r 50,1,15 -w 1
+      Generate, run, process, compare, and visualize small SPE11B cases.
 
-The following is the figure `spe11b_tco2_2Dmaps`, which shows the CO2 mass in the domain over time (i.e., the simulations results from
-the corner-point grid mapped to the equidistance reporting grid of 50 x 15 as defined by the -r flag). You can
-compare your example results to this figure to evaluate if your example ran correctly:
+   .. grid-item-card:: Corner-point grids
+      :link: example-cp-grids
+      :link-type: ref
+      :img-top: figs/11_levels_dz_i,1,k_t5.png
 
-.. figure:: figs/spe11b_tco2_2Dmaps.png
+      Compare SPE11B corner-point grids with 11 and 18 levels.
 
-This example uses a very coarser grid to run fast. See the :doc:`benchmark <./benchmark>` section for finer grids.
+   .. grid-item-card:: Localized lower domain
+      :link: example-lower-domain
+      :link-type: ref
+      :img-top: figs/lower_domain_pvtnum-1-satnum_i,14,k_t5.png
 
-.. note::
-    To generate only the input files, this can be achieved by executing:
+      Generate the localized lower region of SPE11C.
 
-    .. code-block:: bash
+.. toctree::
+   :hidden:
+   :maxdepth: 1
 
-        pyopmspe11 -i spe11b.toml -o spe11b -m deck
-    
-    This does not required to have OPM Flow installed, and works in Windows without using the subsystem for Linux (see `ci_pyopmspe11_windows.yml <https://github.com/opm/pyopmspe11/blob/main/.github/workflows/ci_pyopmspe11_windows.yml>`_).
-    Then, one could always generate a deck with the grid and all include files, and modify them in order to use other simulators different than OPM Flow. 
-
-Let us now change the model type from complete to immiscible, isothermal, and convective in line 7 of the configuration file, saving the toml file to these three model respectively.
-Then, we run the simulations:
-
-.. code-block:: bash
-
-    pyopmspe11 -i immiscible.toml -o immiscible -m deck_flow_data -w 1
-    pyopmspe11 -i isothermal.toml -o isothermal -m deck_flow_data -w 1
-    pyopmspe11 -i convective.toml -o convective -m deck_flow_data -w 1
-
-Here we have just set the framework to generate the deck, run the simulations, and generate the performance and sparse data (default value for **-g**).
-Then, to visualize the comparison between both runs, this can be achieved by executing:
-
-.. code-block:: bash
-
-    pyopmspe11 -c spe11b
-
-The following are some of the figures generated in the compare folder:
-
-.. figure:: figs/spe11b_sparse_data.png
-.. figure:: figs/spe11b_performance.png
-
-    The immiscible and isothermal simulations run faster since they have less dof.
-
-.. note::
-
-    `plopm <https://github.com/cssr-tools/plopm>`_ facilitates the visualization of selected results, and can be installed by:
-
-    .. code-block:: bash
-        
-        pip install git+https://github.com/cssr-tools/plopm.git
-
-For example, the following figures are generated using `plopm <https://github.com/cssr-tools/plopm>`_ with the commands:
-
-.. code-block:: bash
-
-    plopm -i isothermal/flow/ISOTHERMAL -v sgas -t 'Isothermal simulation (end of simulation)'
-    plopm -i 'immiscible/data/spe11b_time_series convective/data/spe11b_time_series' -csv 1,4 -labels "Immiscible  Convective" -tunits y -ylabel 'mobA [kg]' -xformat .0f -x '[0,25]' -xlnum 6 -f 20 -d 10,5 -yformat .1e -e 'solid,solid' -lw 4 -step 1
-
-.. figure:: figs/plopm_hello_world.png
-
-All previous commands can be executed from the main repository location as (`docs_hello_world.sh <https://github.com/OPM/pyopmspe11/blob/main/tests/scripts/docs_hello_world.sh>`_):
-
-.. code-block:: bash
-
-    . ./tests/scripts/docs_hello_world.sh
-
-.. tip::
-
-    `This example <https://cssr-tools.github.io/plopm/examples.html#reading-from-csv-files>`_ shows how to use `plopm <https://github.com/cssr-tools/plopm>`_ to
-    generate nice figures to compare simulation results (both from csv files (e.g., using the `benchmark data set <https://darus.uni-stuttgart.de/dataset.xhtml?persistentId=doi:10.18419/DARUS-4750>`_ ) and from OPM Flow output files).
-
-===========================
-Cp grids (11 and 18 levels)
-===========================
-In a `recent paper <https://link.springer.com/article/10.1007/s11242-025-02275-0>`_ to history match the FluidFlower data using the laboratory images, a more regular corner-point grid
-was used consisting in 11 levels instead of 18 as the submitted results for the SPE11 benchmark. Then, the corner-point grid from that paper has been included in the
-**pyopmspe11** tool. To use this corner-point grid, then one needs to give an array of size 11 for the variable "z_n" in the toml files. For example, in the
-`spe11b.toml <https://github.com/OPM/pyopmspe11/blob/main/examples/spe11b.toml>`_ in the examples folder, setting z_n to [2, 2, 2, 3, 2, 2, 8, 4, 8, 8, 1] and
-saving the configuration file as spe11b_11-levels.toml, running them (we add the flag **-f 0** to generate the deck and simulation files in the output folder, i.e., no subfolders deck and flow), and using **plopm** to generate the figure:
-
-.. code-block:: bash
-
-    pyopmspe11 -i spe11b.toml -o 18_levels -f 0
-    pyopmspe11 -i spe11b_11-levels.toml -o 11_levels -f 0
-    plopm -i '18_levels/18_LEVELS 11_levels/11_LEVELS' -v dz -subfigs 2,1 -delax 1 -z 0 -suptitle 0 -grid 'black,1e-2' -cbsfax 0.35,0.97,0.3,0.02
-
-.. image:: ./figs/11_levels_dz_i,1,k_t5.png
-
-All previous commands can be executed from the main repository location as (`docs_cp_grids.sh <https://github.com/OPM/pyopmspe11/blob/main/tests/scripts/docs_cp_grids.sh>`_):
-
-.. code-block:: bash
-
-    . ./tests/scripts/docs_cp_grids.sh
-
-======================
-Localized lower domain
-======================
-The flag **-n lower** results in the generation of files for the lower part (lower facie 5, removing the sealing facie 1) of the models. For example, using the `spe11c.toml <https://github.com/OPM/pyopmspe11/blob/main/examples/spe11c.toml>`_ configuration file in the examples folder:
-
-.. code-block:: bash
-
-    pyopmspe11 -i spe11c.toml -o lower_domain -f 0 -n lower
-    plopm -i lower_domain/LOWER_DOMAIN -s ,14, -y '[1200,700]' -z 0 -grid 'black,1e-2' -t "SPE11C Cartesian lower domain (y = 2500 m)" -clabel "Facies" -c '161;163;160 101;64;147 81;124;66 181;73;57 193;127;97 127;148;191 193;147;56' -cticks '[7, 6, 5, 4, 3, 2, 1]' -v 'pvtnum - 1 - satnum'
-
-.. image:: ./figs/lower_domain_pvtnum-1-satnum_i,14,k_t5.png
-
-All previous commands can be executed from the main repository location as (`docs_localized_lower_domain.sh <https://github.com/OPM/pyopmspe11/blob/main/tests/scripts/docs_localized_lower_domain.sh>`_):
-
-.. code-block:: bash
-
-    . ./tests/scripts/docs_localized_lower_domain.sh
-
-See the :doc:`convergence <./convergence>` for using the localized domain in the SPE11B corner-point grid case.
+   examples/hello-world
+   examples/cp-grids
+   examples/lower-domain

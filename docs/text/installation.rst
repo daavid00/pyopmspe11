@@ -1,137 +1,251 @@
-============
+.. _installation:
+
 Installation
 ============
 
-The following steps work installing the dependencies in Linux via apt-get or in macOS using brew or macports.
-While using packages managers such as Anaconda, Miniforge, or Mamba might work, these are not tested.
-The supported Python versions are 3.11 to 3.14.
+The following instructions cover dependency installation on Linux with
+``apt-get`` and on macOS with Homebrew or MacPorts. Package managers such as
+Anaconda, Miniforge, and Mamba might work, but they are not tested.
 
-`ResInsight <https://resinsight.org>`_ and `plopm <https://github.com/cssr-tools/plopm>`_ are used for the visualization of the results.
+**pyopmspe11** supports Python 3.12 to 3.14.
 
-.. note::
+`ResInsight <https://resinsight.org/>`_ and
+`plopm <https://github.com/cssr-tools/plopm>`_ can be used to visualize the
+simulation results.
 
-    There are binary packages for Linux and Windows to install Resinsight, see the `ResInsight Documentation <https://resinsight.org/releases/>`_. For macOS users, you could try to install it using `brew <https://brew.sh>`_ by executing:
+Visualization tools
+-------------------
 
-    .. code-block:: bash
+ResInsight
+++++++++++
 
-        brew tap cssr-tools/opm
-        brew trust cssr-tools/opm
-        brew install cssr-tools/opm/resinsight -y
-    
-    Then, you should be able to open resinsight by typing in the terminal **resinsight**.
+Binary ResInsight packages are available for Linux and Windows. See the
+`ResInsight releases <https://resinsight.org/releases/>`_ for installation
+instructions.
+
+On macOS, install ResInsight with Homebrew:
+
+.. code-block:: console
+
+   brew tap cssr-tools/opm
+   brew trust cssr-tools/opm
+   brew install cssr-tools/opm/resinsight -y
+
+Verify the installation:
+
+.. code-block:: console
+
+   resinsight
+
+plopm
++++++
+
+Install **plopm** to create additional maps, summary plots, GIF animations,
+CSV exports, and VTK files:
+
+.. code-block:: console
+
+   pip install git+https://github.com/cssr-tools/plopm.git
 
 .. _vpyopmspe11:
 
 Python package
 --------------
 
-To install the **pyopmspe11** executable from the development version: 
-
-.. code-block:: bash
-
-    pip install git+https://github.com/opm/pyopmspe11.git
-
-If you are interested in a specific version (e.g., v2026.04) or in modifying the source code, then you can clone the repository and 
-install the Python requirements in a virtual environment with the following commands:
+Install the development version of **pyopmspe11** in an existing Python
+environment:
 
 .. code-block:: console
 
-    # Clone the repo
-    git clone https://github.com/opm/pyopmspe11.git
-    # Get inside the folder
-    cd pyopmspe11
-    # For a specific version (e.g., v2026.04), or skip this step (i.e., edge version)
-    git checkout v2026.04
-    # Create virtual environment (to specific Python, python3.13 -m venv vpyopmspe11)
-    python3 -m venv vpyopmspe11
-    # Activate virtual environment
-    source vpyopmspe11/bin/activate
-    # Upgrade pip, setuptools, and wheel
-    pip install --upgrade pip setuptools wheel
-    # Install the pyopmspe11 package
-    pip install -e .
-    # For contributions/testing/linting, install the dev-requirements
-    pip install -r dev-requirements.txt
+   pip install git+https://github.com/OPM/pyopmspe11.git
+
+To install a specific version, modify the source code, or contribute to the
+project, clone the repository and create a virtual environment:
+
+.. code-block:: console
+
+   # Clone the repository
+   git clone https://github.com/OPM/pyopmspe11.git
+
+   # Enter the repository
+   cd pyopmspe11
+
+   # Optional: select a release, or skip this step to use the development version
+   git checkout v2026.04
+
+   # Create a virtual environment
+   # To select a Python executable, use for example: python3.13 -m venv vpyopmspe11
+   python3 -m venv vpyopmspe11
+
+   # Activate the virtual environment
+   source vpyopmspe11/bin/activate
+
+   # Upgrade the packaging tools
+   pip install --upgrade pip setuptools wheel
+
+   # Install pyopmspe11 in editable mode
+   pip install -e .
+
+   # Optional: install requirements for contributions, testing, and linting
+   pip install -r dev-requirements.txt
 
 .. tip::
 
-    Typing **git tag -l** writes all available specific versions.
+   Run ``git tag -l`` to list the available releases.
 
-.. note::
-  
-    For not macOS users, to install the (optional but recommended) dependencies used for the figure's LaTeX formatting, execute 
-    
-    **sudo apt-get install texlive-fonts-recommended texlive-fonts-extra dvipng cm-super**
+Optional LaTeX formatting
+-------------------------
 
-    For macOS users, the LaTeX dependency can be installed from https://www.tug.org/mactex/.
+LaTeX support is optional but recommended for figure formatting.
+
+On Linux distributions using ``apt-get``, install:
+
+.. code-block:: console
+
+   sudo apt-get install texlive-fonts-recommended texlive-fonts-extra dvipng cm-super
+
+On macOS, install `MacTeX <https://www.tug.org/mactex/>`_.
+
+.. _opm-flow-installation:
 
 OPM Flow
 --------
-You also need to install:
 
-* OPM Flow (https://opm-project.org, Release 2026.04 or current master branches)
+OPM Flow is required to run simulations and generate benchmark data from the
+simulation results. Deck-only workflows, such as ``-m deck``, do not require
+OPM Flow.
+
+Use OPM Flow Release 2026.04 or the current master branches. See the
+`OPM project website <https://opm-project.org/>`_ for general information.
 
 Binary packages
 +++++++++++++++
 
-See the `downloading and installing <https://opm-project.org/?page_id=36>`_ OPM Flow online documentation for 
-instructions to install the binary packages in Ubuntu and Red Hat Enterprise Linux, and for other platforms which are
-supported either via source builds or through running a virtual machine.
+See the OPM Flow `download and installation instructions
+<https://opm-project.org/?page_id=36>`_ for binary packages on Ubuntu and Red
+Hat Enterprise Linux. The same page describes other supported platforms,
+including source builds and virtual-machine-based installations.
 
 .. tip::
 
-    See the `ci_pyopmspe11_ubuntu.yml <https://github.com/opm/pyopmspe11/blob/main/.github/workflows/ci_pyopmspe11_ubuntu.yml>`_ script 
-    for installation of OPM Flow (binary packages), LaTeX (optional) libraries, and the pyopmspe11 package in Ubuntu.
+   The pyopmspe11 `Ubuntu CI workflow
+   <https://github.com/OPM/pyopmspe11/blob/main/.github/workflows/ci_pyopmspe11_ubuntu.yml>`_
+   shows the installation of OPM Flow binary packages, optional LaTeX
+   libraries, and **pyopmspe11**.
 
-Source build in Linux/Windows
-+++++++++++++++++++++++++++++
-If you are a Linux user (including the Windows subsystem for Linux, see `this link <https://learn.microsoft.com/en-us/windows/python/web-frameworks>`_ 
-for a nice tutorial for setting Python environments in WSL), then you could try to build flow (after installing the `prerequisites <https://opm-project.org/?page_id=239>`_) from the master branches with mpi support by running
-in the terminal the following lines (which in turn should build flow in the folder ./build/opm-simulators/bin/flow): 
+Source build on Linux
++++++++++++++++++++++
 
-.. code-block:: console
+After installing the OPM `prerequisites
+<https://opm-project.org/?page_id=239>`_, build Flow from the current master
+branches. The following commands create the executable at
+``./build/opm-simulators/bin/flow``:
 
-    CURRENT_DIRECTORY="$PWD"
+.. code-block:: bash
 
-    mkdir build
+   CURRENT_DIRECTORY="$PWD"
 
-    for repo in common grid simulators
-    do  git clone https://github.com/OPM/opm-$repo.git
-        mkdir build/opm-$repo
-        cd build/opm-$repo
-        cmake -DWITH_NDEBUG=1 -DCMAKE_BUILD_TYPE=Release $CURRENT_DIRECTORY/opm-$repo
-        if [[ $repo == simulators ]]; then
-            make -j5 flow
-        else
-            make -j5 opm$repo
-        fi
-        cd ../..
-    done
+   mkdir build
 
+   for repo in common grid simulators
+   do
+       git clone https://github.com/OPM/opm-$repo.git
+       mkdir build/opm-$repo
+       cd build/opm-$repo
+       cmake -DWITH_NDEBUG=1 -DCMAKE_BUILD_TYPE=Release $CURRENT_DIRECTORY/opm-$repo
+       if [[ $repo == simulators ]]; then
+           make -j5 flow
+       else
+           make -j5 opm$repo
+       fi
+       cd ../..
+   done
+
+To build with MPI support, add ``-DUSE_MPI=1`` to the ``cmake`` command.
 
 .. tip::
 
-    You can create a .sh file (e.g., build_opm_mpi.sh), copy the previous lines, and run in the terminal **source build_opm_mpi.sh**
+   Save the commands in a shell script, for example ``build_opm_mpi.sh``, and
+   run it with:
+
+   .. code-block:: console
+
+      . ./build_opm_mpi.sh
+
+Set the ``flow`` value in the TOML configuration to the resulting executable
+and any required simulator options:
+
+.. code-block:: toml
+
+   flow = "/path/to/build/opm-simulators/bin/flow --enable-opm-rst-file=true --output-extra-convergence-info=steps,iterations"
+
+See :doc:`configuration_file` for the complete configuration format.
 
 .. _macOS:
 
-Brew formula for macOS
-++++++++++++++++++++++
-For macOS, there are no available binary packages, so OPM Flow needs to be built from source. Recently, a formula to build flow using brew has
-been added in `https://github.com/cssr-tools/homebrew-opm <https://github.com/cssr-tools/homebrew-opm>`_. 
-Then, you can try to install flow (Interim Release v2026.07) by simply typing:
+Homebrew formula for macOS
+++++++++++++++++++++++++++
+
+Binary OPM Flow packages are not available for macOS, so Flow must be built
+from source. The `cssr-tools/homebrew-opm
+<https://github.com/cssr-tools/homebrew-opm>`_ repository provides a Homebrew
+formula for this purpose.
+
+Install the OPM Flow v2026.07 interim release with:
 
 .. code-block:: console
 
-    brew tap cssr-tools/opm
-    brew trust cssr-tools/opm
-    brew install cssr-tools/opm/opm-simulators -y
+   brew tap cssr-tools/opm
+   brew trust cssr-tools/opm
+   brew install cssr-tools/opm/opm-simulators -y
 
-You can check if the installation of OPM Flow succeeded by typing in the terminal **flow \-\-help**.
+Verify the installation:
+
+.. code-block:: console
+
+   flow --help
 
 .. tip::
-    See the actions in the `cssr-tools/homebrew-opm <https://github.com/cssr-tools/homebrew-opm/actions>`_ repository. 
 
-Source build in macOS
+   See the `homebrew-opm workflow results
+   <https://github.com/cssr-tools/homebrew-opm/actions>`_ for tested builds.
+
+Source build on macOS
 +++++++++++++++++++++
-See `this repository <https://github.com/daavid00/OPM-Flow_macOS>`_ dedicated to build OPM Flow from source in macOS 26 (GitHub actions), and tested with **pycopm**, a repository in cssr-tools.
+
+See the `OPM-Flow_macOS repository
+<https://github.com/daavid00/OPM-Flow_macOS>`_ for a source-build workflow for
+OPM Flow on macOS 26. The workflow runs with GitHub Actions and is tested with
+**pycopm**, another project in the ``cssr-tools`` organization.
+
+Windows deck generation
+-----------------------
+
+On Windows, **pyopmspe11** supports deck generation with ``-m deck``. Running
+OPM Flow and the data or plotting workflows requires a supported OPM Flow
+environment. If another mode is selected on Windows, **pyopmspe11** continues
+with deck generation only.
+
+Verify the installation
+-----------------------
+
+Display the command-line help:
+
+.. code-block:: console
+
+   pyopmspe11 --help
+
+Generate an input deck without running OPM Flow:
+
+.. code-block:: console
+
+   pyopmspe11 -i examples/spe11b.toml -o spe11b -m deck
+
+Next steps
+----------
+
+* Review the :doc:`configuration_file` reference to define a simulation case.
+* Run the :doc:`examples` for complete, reproducible workflows.
+* Use the :doc:`command-line` for exact syntax, defaults, and option
+  compatibility.
+* See :doc:`output_folder` for the generated folder structure.

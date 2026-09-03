@@ -2,66 +2,134 @@
 # SPDX-License-Identifier: MIT
 # pylint: disable=R0912, R0915
 
-"""Main script for pyopmspe11"""
+"""Command-line entry point and top-level workflow coordination for pyopmspe11.
+
+pyopmspe11 supports four connected workflows for the SPE11 benchmark cases:
+
+* Deck generation creates OPM Flow input from TOML or legacy configuration.
+* Simulation execution runs OPM Flow for the generated deck.
+* Data processing converts OPM results to sparse, dense, and performance CSVs.
+* Plotting creates benchmark figures or comparisons from generated CSV data.
+
+This module parses and validates command-line arguments, builds the shared
+configuration, creates output folders, dispatches the selected workflows, and
+reports generated files. Geometry, file writing, result processing, and plotting
+are implemented in the utility and visualization modules.
+"""
 
 import argparse
 import os
 import subprocess
-import sys
 
-from pyopmspe11.utils.inputvalues import check_deck, process_input
-from pyopmspe11.utils.mapproperties import generate_files
-from pyopmspe11.utils.runs import data, plotting, simulations
+from pyopmspe11.utils.inputvalues import build_config, check_flow_version
+from pyopmspe11.utils.mapproperties import generate_deck_files
+from pyopmspe11.utils.runs import generate_benchmark_data, generate_plots, run_flow
+from pyopmspe11.utils.terminal import (
+    cli_correct_value,
+    cli_error_value,
+    pyopmspe11_error,
+    pyopmspe11_info,
+    pyopmspe11_success,
+    pyopmspe11_warning,
+)
 from pyopmspe11.visualization.plotting import plot_results
 
 
 def main(argv: list[str] | None = None) -> None:
-    """Main entry point"""
-    args = load_parser(argv)
-    check_cmdargs(args)
+    """Run the pyopmspe11 command-line workflow.
+
+    Parse and validate CLI arguments, initialize the shared configuration, and
+    dispatch the selected deck, Flow, data, plotting, or comparison operations.
+
+    Parameters
+    ----------
+    argv : list[str] | None, optional
+        Arguments to parse instead of ``sys.argv[1:]``. This is primarily used by
+        tests and programmatic callers.
+    """
+    args = _parse_arguments(argv)
+    _validate_arguments(args)
+    current_dir = os.getcwd()
 
     if args.compare:
-        print("\nCompare: Generating common plots to compare results, please wait.")
-        plot_results({"compare": args.compare})
-        print(f"\nThe figures have been written to {os.getcwd()}/compare/")
+        pyopmspe11_info("processing the comparison, please wait...")
+        generated_files = plot_results({"compare": args.compare})
+        pyopmspe11_success("", f"{current_dir}/compare", generated_files)
         return
 
-    cfg = process_input(args)
+    cfg = build_config(args)
     cfg.deckfol = f"{cfg.fol}/deck" if cfg.subfolders == "1" else cfg.fol
     flowfol = f"{cfg.fol}/flow" if cfg.subfolders == "1" else cfg.fol
-    make_dir(cfg.fol)
+    plotfol = f"{cfg.fol}/plot" if cfg.subfolders == "1" else cfg.fol
+    datafol = f"{cfg.fol}/data" if cfg.subfolders == "1" else cfg.fol
+    _create_directory(cfg.fol)
     os.chdir(cfg.fol)
 
-    if cfg.mode == "all" or "deck" in cfg.mode:
-        if cfg.subfolders == "1":
-            make_dir(cfg.deckfol)
-        print("\nDeck: Generating the input files, please wait.")
-        generate_files(cfg)
-        print(f"\nThe deck files have been written to {cfg.deckfol}")
+    try:
+        if cfg.mode == "all" or "deck" in cfg.mode:
+            if cfg.subfolders == "1":
+                _create_directory(cfg.deckfol)
+            pyopmspe11_info("generating the input files, please wait...")
+            generated_files = generate_deck_files(cfg)
+            pyopmspe11_success("", cfg.deckfol, sorted(generated_files))
 
-    if cfg.mode == "all" or "flow" in cfg.mode:
-        check_deck(cfg)
-        print("\nFlow: Running the simulations, please wait.")
-        simulations(cfg, flowfol)
-        print(f"\nThe simulation results have been written to {flowfol}")
+        if cfg.mode == "all" or "flow" in cfg.mode:
+            check_flow_version(cfg)
+            pyopmspe11_info("running the simulations, please wait...")
+            run_flow(cfg, flowfol)
+            pyopmspe11_success("simulation results written to ", flowfol, [""])
 
-    if cfg.mode == "all" or "data" in cfg.mode:
-        make_dir(f"{cfg.fol}/data" if cfg.subfolders == "1" else cfg.fol)
-        data(cfg)
+        if cfg.mode == "all" or "data" in cfg.mode:
+            _create_directory(f"{cfg.fol}/data" if cfg.subfolders == "1" else cfg.fol)
+            pyopmspe11_info("generating the csv files, please wait...")
+            generated_files = generate_benchmark_data(cfg)
+            n = len(generated_files)
+            if n > 10:
+                pyopmspe11_success(f"{n} csv files written to ", datafol, [""])
+            else:
+                pyopmspe11_success("", datafol, generated_files)
 
-    if cfg.mode == "all" or "plot" in cfg.mode:
-        make_dir(f"{cfg.fol}/figures" if cfg.subfolders == "1" else cfg.fol)
-        plotting(cfg)
+        if cfg.mode == "all" or "plot" in cfg.mode:
+            _create_directory(
+                f"{cfg.fol}/figures" if cfg.subfolders == "1" else cfg.fol
+            )
+            pyopmspe11_info("generating png figures, please wait...")
+            generated_files = generate_plots(cfg)
+            n = len(generated_files)
+            if n > 10:
+                pyopmspe11_success(f"{n} png figures written to ", plotfol, [""])
+            else:
+                pyopmspe11_success("", plotfol, generated_files)
+    finally:
+        os.chdir(current_dir)
 
 
-def make_dir(path: str) -> None:
-    """Create directory if missing"""
+def _create_directory(path: str) -> None:
+    """Create an output directory when it does not exist.
+
+    Parameters
+    ----------
+    path : str
+        Input or output path.
+    """
     if not os.path.exists(path):
         subprocess.run(["mkdir", "-p", path], check=True)
 
 
-def load_parser(argv: list[str] | None) -> argparse.Namespace:
-    """CLI arguments"""
+def _parse_arguments(argv: list[str] | None) -> argparse.Namespace:
+    """Create the CLI parser and parse pyopmspe11 arguments.
+
+    Parameters
+    ----------
+    argv : list[str] | None
+        Arguments to parse instead of ``sys.argv[1:]``. This is primarily used by
+        tests and programmatic callers.
+
+    Returns
+    -------
+    argparse.Namespace
+        Parsed command-line arguments.
+    """
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         description="pyopmspe11, a Python tool for the three SPE11 benchmark"
@@ -170,87 +238,85 @@ def load_parser(argv: list[str] | None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def check_cmdargs(cmdargs: argparse.Namespace) -> None:
-    """Validate command-line arguments and incompatible operations.
+def _validate_arguments(cmdargs: argparse.Namespace) -> None:
+    """Validate command-line values and incompatible operations.
 
-    The checks cover configuration and output names, spatial resolution,
-    reporting times and intervals, comparison mode, and options restricted
-    to data-generation workflows.
+    Validation covers numeric syntax, benchmark-specific restrictions, workflow
+    dependencies, and requested data and plotting modes.
 
     Parameters
     ----------
-    cmdargs
-        Parsed arguments returned by :func:`load_parser`.
+    cmdargs : argparse.Namespace
+        Parsed data-generation arguments.
 
     Raises
     ------
     SystemExit
-        If an argument is invalid or an incompatible combination is requested.
+        If an input value is invalid or required input cannot be used.
     """
     input_file = cmdargs.input
     if not input_file:
-        print("\nInvalid value for '-i', the input file cannot be empty.\n")
-        raise SystemExit(1)
-    if not input_file.lower().endswith((".toml", ".txt")):
-        print(
-            f"\nInvalid extension for input file '-i {input_file}', "
-            "valid extensions are .toml or .txt.\n"
+        pyopmspe11_error(
+            f"invalid value {cli_error_value('-i')}, the input file cannot be empty."
         )
-        raise SystemExit(1)
+    if not input_file.lower().endswith((".toml", ".txt")):
+        pyopmspe11_error(
+            f"invalid extension {cli_error_value(f'-i {input_file}')}, valid extensions "
+            f"are {cli_correct_value('.toml')} or {cli_correct_value('.txt')}."
+        )
     if not cmdargs.output:
-        print("\nInvalid value for '-o', the output folder cannot be empty.\n")
-        raise SystemExit(1)
+        pyopmspe11_error(
+            f"invalid value {cli_error_value('-o')}, the output folder cannot be empty."
+        )
     resolution = cmdargs.resolution
     try:
         resolution_values = [int(value.strip()) for value in resolution.split(",")]
     except ValueError:
         resolution_values = []
     if len(resolution_values) != 3 or any(value <= 0 for value in resolution_values):
-        print(
-            f"\nInvalid value '-r {resolution}', expected three positive "
-            "integers separated by commas, e.g., '-r 8,1,5'.\n"
+        pyopmspe11_error(
+            f"invalid value {cli_error_value(f'-r {resolution}')}, expected three positive "
+            f"integers separated by commas, {cli_correct_value('e.g., -r 8,1,5')}."
         )
-        raise SystemExit(1)
     time = cmdargs.time
     try:
         time_values = [float(value.strip()) for value in time.split(",")]
     except ValueError:
         time_values = []
     if not time_values or any(value < 0 for value in time_values):
-        print(
-            f"\nInvalid value '-t {time}', expected non-negative numbers "
-            "separated by commas.\n"
+        pyopmspe11_error(
+            f"invalid value {cli_error_value(f'-t {time}')}, expected non-negative numbers."
         )
-        raise SystemExit(1)
     write = cmdargs.write
     try:
         write_value = float(write)
     except ValueError:
         write_value = 0
     if write_value <= 0:
-        print(f"\nInvalid value '-w {write}', expected a positive number.\n")
-        raise SystemExit(1)
+        pyopmspe11_error(
+            f"invalid value {cli_error_value(f'-w {write}')}, expected a positive number."
+        )
     mode = cmdargs.mode
-    has_data = mode == "all" or "data" in mode
+    has_data_plot = mode == "all" or ("data" in mode or "plot" in mode)
     data_options = {
         "-g": ("generate", "performance_sparse"),
         "-r": ("resolution", "8,1,5"),
         "-t": ("time", "5"),
         "-w": ("write", "0.1"),
     }
-    if not has_data:
+    if not has_data_plot:
         invalid_options = [
             option
             for option, (name, default) in data_options.items()
             if getattr(cmdargs, name) != default
         ]
         if invalid_options:
-            print(
-                f"\nInvalid option for '-m {mode}'; {', '.join(invalid_options)} "
+            txt = ", ".join(invalid_options)
+            pyopmspe11_error(
+                f"invalid value {cli_error_value(f'-m {mode}; {txt}')} "
                 "can only be used when the selected mode writes benchmark "
-                "data.\n"
+                "data or figures."
             )
-            raise SystemExit(1)
     compare = cmdargs.compare
     if compare:
         compare_options = {
@@ -270,13 +336,14 @@ def check_cmdargs(cmdargs: argparse.Namespace) -> None:
             if getattr(cmdargs, name) != default
         ]
         if invalid_options:
-            print(
-                "\nInvalid combination, '-c' runs the standalone comparison "
+            pyopmspe11_error(
+                f"invalid combination, {cli_error_value('-c')} runs the standalone comparison "
                 "workflow and cannot be combined with "
-                f"{', '.join(invalid_options)}.\n"
+                f"{cli_error_value(', '.join(invalid_options))}."
             )
-            raise SystemExit(1)
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])
+    if os.name == "nt" and mode != "deck":
+        pyopmspe11_warning(
+            f"unsupported {cli_error_value(f'-m {mode}')} in Windows; only"
+            f"{cli_correct_value('-m deck')} is supported. The execution "
+            f"of pyopmspe11 will continue using {cli_correct_value('-m deck')}."
+        )
